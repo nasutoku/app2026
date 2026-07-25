@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>首振り絵本ビューア</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            /* タップ時のハイライトなどを抑制 */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #book-container {
+            position: relative;
+            width: 90vw;
+            height: 65vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #222;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .page-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        .page-img.active {
+            display: block;
+        }
+        #camera-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 120px;
+            height: 90px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            overflow: hidden;
+            transform: scaleX(-1); /* 鏡映像にする */
+            z-index: 10;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90vw;
+        }
+        #page-number {
+            position: absolute;
+            bottom: 15px;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="book-container">
+        <img src="01.JPG" class="page-img active">
+        <img src="02.JPG" class="page-img">
+        <img src="03.JPG" class="page-img">
+        <img src="04.JPG" class="page-img">
+        <img src="05.JPG" class="page-img">
+        <img src="06.JPG" class="page-img">
+        <img src="07.JPG" class="page-img">
+        <img src="08.JPG" class="page-img">
+        <img src="09.JPG" class="page-img">
+        <img src="10.JPG" class="page-img">
+        <img src="11.JPG" class="page-img">
+        <img src="12.JPG" class="page-img">
+        <img src="13.JPG" class="page-img">
+        <img src="14.JPG" class="page-img">
+        <img src="15.JPG" class="page-img">
+        <img src="16.JPG" class="page-img">
+        <img src="17.JPG" class="page-img">
+        <img src="18.JPG" class="page-img">
+        <img src="19.JPG" class="page-img">
+
+        <div id="page-number">1 / 19</div>
+    </div>
+
+    <div id="status">カメラを読み込み中... 顔を正面に向けてください</div>
+
+    <div id="camera-container">
+        <!-- モバイル（iOS Safari等）対応として playsinline, autoplay, muted を追加 -->
+        <video id="input-video" playsinline autoplay muted></video>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('input-video');
+        const statusElement = document.getElementById('status');
+        const pageNumElement = document.getElementById('page-number');
+        const pages = document.querySelectorAll('.page-img');
+        
+        let currentPage = 0;
+        let isCoolDown = false;
+        const COOL_DOWN_TIME = 1500;
+
+        function updatePage(index) {
+            if (index < 0 || index >= pages.length) return;
+            pages[currentPage].classList.remove('active');
+            currentPage = index;
+            pages[currentPage].classList.add('active');
+            pageNumElement.innerText = `${currentPage + 1} / ${pages.length}`;
+        }
+
+        function onResults(results) {
+            if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+                statusElement.innerText = "顔が検出されません";
+                return;
+            }
+
+            const landmarks = results.multiFaceLandmarks[0];
+            const nose = landmarks[1];
+            const leftEar = landmarks[234];
+            const rightEar = landmarks[454];
+
+            const faceWidth = Math.abs(rightEar.x - leftEar.x);
+            const noseRelativeX = (nose.x - leftEar.x) / faceWidth;
+
+            if (isCoolDown) {
+                statusElement.innerText = "（待機中...）";
+                return;
+            }
+
+            statusElement.innerText = "正面を向いています。首を振ってページめくり";
+
+            if (noseRelativeX < 0.35) { 
+                if (currentPage < pages.length - 1) {
+                    triggerPageFlip(currentPage + 1, "👉 次のページへ");
+                }
+            } else if (noseRelativeX > 0.65) {
+                if (currentPage > 0) {
+                    triggerPageFlip(currentPage - 1, "👈 前のページへ");
+                }
+            }
+        }
+
+        function triggerPageFlip(nextPage, message) {
+            isCoolDown = true;
+            statusElement.innerText = message;
+            updatePage(nextPage);
+            
+            setTimeout(() => {
+                isCoolDown = false;
+            }, COOL_DOWN_TIME);
+        }
+
+        const faceMesh = new FaceMesh({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+        });
+
+        faceMesh.setOptions({
+            maxNumFaces: 1,
+            refineLandmarks: false,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        faceMesh.onResults(onResults);
+
+        // iPad/スマホのフロントカメラを確実ادに指定するための設定
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await faceMesh.end ? await faceMesh.send({image: videoElement}) : await faceMesh.send({image: videoElement});
+            },
+            facingMode: 'user', // 内側（インカメラ）を指定
+            width: 640,
+            height: 480
+        });
+
+        camera.start().then(() => {
+            statusElement.innerText = "準備完了！顔を左右に振ってみてください。";
+        }).catch(err => {
+            statusElement.innerText = "カメラの起動に失敗しました: " + err;
+            console.error(err);
+        });
+    </script>
+</body>
+</html>

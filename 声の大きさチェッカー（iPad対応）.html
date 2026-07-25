@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>声の大きさチェッカー</title>
+
+<style>
+body{
+    font-family: "Yu Gothic", sans-serif;
+    text-align:center;
+    background:#f0f4f8;
+    padding:30px;
+}
+
+h1{
+    color:#333;
+}
+
+#face{
+    font-size:180px;
+    margin:20px;
+}
+
+#level{
+    font-size:40px;
+    font-weight:bold;
+    margin:10px;
+}
+
+#value{
+    font-size:22px;
+    color:#666;
+}
+
+button{
+    font-size:20px;
+    padding:12px 24px;
+    border:none;
+    border-radius:10px;
+    background:#4CAF50;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#45a049;
+}
+
+.meter{
+    width:400px;
+    max-width:90%;
+    height:30px;
+    margin:20px auto;
+    background:#ddd;
+    border-radius:15px;
+    overflow:hidden;
+}
+
+.bar{
+    height:100%;
+    width:0%;
+    background:#4CAF50;
+    transition:0.1s;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎤 声の大きさチェッカー</h1>
+
+<button id="startBtn">マイク開始</button>
+
+<div class="meter">
+    <div class="bar" id="bar"></div>
+</div>
+
+<div id="face">🙂</div>
+<div id="level">待機中</div>
+<div id="value">音量: 0</div>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const face = document.getElementById("face");
+const level = document.getElementById("level");
+const value = document.getElementById("value");
+const bar = document.getElementById("bar");
+
+startBtn.addEventListener("click", async () => {
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        const audioContext = new AudioContext();
+        const analyser = audioContext.createAnalyser();
+
+        analyser.fftSize = 256;
+
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        function monitor() {
+
+            analyser.getByteFrequencyData(dataArray);
+
+            let sum = 0;
+            for(let i = 0; i < dataArray.length; i++){
+                sum += dataArray[i];
+            }
+
+            const volume = sum / dataArray.length;
+
+            const percent = Math.min(volume * 2, 100);
+            bar.style.width = percent + "%";
+
+            value.textContent = "音量: " + Math.round(volume);
+
+           if(volume < 20){
+    face.textContent = "😊";
+    level.textContent = "小さい";
+    bar.style.background = "#2196F3";
+}
+else if(volume < 70){
+    face.textContent = "🙂";
+    level.textContent = "普通";
+    bar.style.background = "#4CAF50";
+}
+else{
+    face.textContent = "😣";
+    level.textContent = "うるさい";
+    bar.style.background = "#F44336";
+}
+
+            requestAnimationFrame(monitor);
+        }
+
+        monitor();
+
+    } catch(error){
+        alert("マイクの使用が許可されていません。");
+        console.error(error);
+    }
+});
+</script>
+
+</body>
+</html>

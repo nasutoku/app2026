@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ことばクレーンゲーム</title>
+<style>
+  :root{
+    --bg-deep:#171033;
+    --bg-mid:#2a1a5e;
+    --neon-pink:#ff3d9a;
+    --neon-cyan:#33e4ff;
+    --neon-yellow:#ffe94d;
+    --cab-metal:#3a3358;
+    --cab-metal-light:#54497f;
+    --paper:#fff8ec;
+    --skin:#ffdcc2;
+    --hair:#5b3a2e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 50% 0%, var(--bg-mid), var(--bg-deep) 65%);
+    font-family:"Hiragino Maru Gothic ProN","Yu Gothic UI",sans-serif;
+    color:var(--paper);
+    padding:8px;
+  }
+
+  .cabinet{
+    width:680px;
+    max-width:96vw;
+    background:linear-gradient(180deg,var(--cab-metal-light),var(--cab-metal));
+    border-radius:28px;
+    padding:8px 16px 8px;
+    box-shadow:0 0 0 3px #201a3d, 0 20px 60px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.35);
+    position:relative;
+  }
+
+  .marquee{
+    text-align:center;
+    padding:6px 0 12px;
+  }
+  .marquee h1{
+    margin:0;
+    font-size:24px;
+    letter-spacing:.08em;
+    color:var(--paper);
+    text-shadow:
+      0 0 6px var(--neon-cyan),
+      0 0 18px var(--neon-cyan),
+      0 0 2px #fff;
+  }
+  .marquee p{
+    margin:4px 0 0;
+    font-size:12px;
+    letter-spacing:.12em;
+    color:var(--neon-yellow);
+    opacity:.85;
+  }
+
+  /* --- question panel with character --- */
+  .question-panel{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:rgba(13,10,36,.55);
+    border:2px solid var(--neon-cyan);
+    border-radius:16px;
+    padding:12px 16px;
+    margin-bottom:12px;
+  }
+  .avatar-wrap{
+    flex:0 0 auto;
+    width:90px;height:90px;
+    border-radius:50%;
+    overflow:hidden;
+    border:2px solid var(--neon-cyan);
+    box-shadow:0 0 10px rgba(51,228,255,.5);
+    background:var(--paper);
+  }
+  .avatar-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 20%;
+    display:block;
+  }
+  .speech{
+    position:relative;
+    flex:1;
+    background:var(--paper);
+    color:#2b2340;
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:20px;
+    font-weight:700;
+    line-height:1.4;
+  }
+  .speech::before{
+    content:"";
+    position:absolute;
+    left:-10px; top:50%;
+    transform:translateY(-50%);
+    border-width:8px 12px 8px 0;
+    border-style:solid;
+    border-color:transparent var(--paper) transparent transparent;
+  }
+  .speech .sub{
+    display:block;
+    margin-top:4px;
+    font-size:11px;
+    font-weight:600;
+    color:#8a7fae;
+  }
+
+  .screen{
+    position:relative;
+    width:100%;
+    height:300px;
+    border-radius:16px;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg,#0d0a24 0%, #191140 55%, #241a4d 100%);
+    box-shadow: inset 0 0 0 4px #100c26, inset 0 0 40px rgba(0,0,0,.7);
+  }
+
+  .screen::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.5px 1.5px at 90px 80px, rgba(255,255,255,.35), transparent),
+      radial-gradient(1.5px 1.5px at 160px 40px, rgba(255,255,255,.4), transparent),
+      radial-gradient(2px 2px at 260px 90px, rgba(255,255,255,.3), transparent),
+      radial-gradient(1.5px 1.5px at 340px 30px, rgba(255,255,255,.4), transparent),
+      radial-gradient(2px 2px at 420px 70px, rgba(255,255,255,.3), transparent),
+      radial-gradient(1.5px 1.5px at 500px 20px, rgba(255,255,255,.4), transparent),
+      radial-gradient(2px 2px at 580px 60px, rgba(255,255,255,.3), transparent);
+    opacity:.6;
+    pointer-events:none;
+  }
+
+  .rail{
+    position:absolute;
+    top:30px; left:0; right:0;
+    height:10px;
+    background:linear-gradient(180deg,#8b86b8,#4d446f);
+    box-shadow:0 2px 6px rgba(0,0,0,.5);
+  }
+
+  .claw-unit{
+    position:absolute;
+    top:30px;
+    width:6px;
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    z-index:5;
+  }
+  .claw-unit .rope{
+    width:4px;
+    background:#cfc9ef;
+  }
+  .claw-unit .hook{
+    width:34px;
+    height:34px;
+    margin-top:-2px;
+    position:relative;
+  }
+  .claw-unit .hook .arm{
+    position:absolute;
+    top:0; left:50%;
+    width:5px; height:16px;
+    background:#e9e4ff;
+    transform-origin:top center;
+    border-radius:2px;
+  }
+  .claw-unit .hook .arm.l{transform:translateX(-50%) rotate(-34deg);}
+  .claw-unit .hook .arm.r{transform:translateX(-50%) rotate(34deg);}
+  .claw-unit.grabbing .hook .arm.l{transform:translateX(-50%) rotate(-8deg);}
+  .claw-unit.grabbing .hook .arm.r{transform:translateX(-50%) rotate(8deg);}
+  .claw-unit .hook .knuckle{
+    position:absolute;
+    top:-4px; left:50%;
+    width:10px;height:10px;
+    background:#cfc9ef;
+    border-radius:50%;
+    transform:translateX(-50%);
+    box-shadow:0 0 6px var(--neon-cyan);
+  }
+
+  .floor{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:58px;
+    background:linear-gradient(180deg,#372a63,#1c1440);
+    box-shadow:inset 0 6px 10px rgba(0,0,0,.4);
+  }
+
+  .card{
+    position:absolute;
+    bottom:12px;
+    width:100px;
+    height:56px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:18px;
+    font-weight:700;
+    line-height:1.25;
+    padding:4px;
+    color:#2b2340;
+    box-shadow:0 6px 0 rgba(0,0,0,.25), 0 8px 14px rgba(0,0,0,.35);
+    border:3px solid rgba(255,255,255,.6);
+    user-select:none;
+    z-index:3;
+  }
+  .card.gone{opacity:0;transition:opacity .3s ease;}
+
+  .tray{
+    position:absolute;
+    top:20px; right:10px;
+    width:40px;
+    background:rgba(13,10,36,.55);
+    border:2px solid var(--neon-cyan);
+    border-radius:12px;
+    padding:8px;
+    font-size:11px;
+    letter-spacing:.05em;
+    z-index:4;
+  }
+  .tray h3{
+    margin:0 0 6px;
+    font-size:11px;
+    color:var(--neon-cyan);
+    text-shadow:0 0 6px var(--neon-cyan);
+  }
+  .tray .slots{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+  }
+  .tray .slot{
+    width:24px;height:24px;
+    border-radius:6px;
+    background:rgba(255,255,255,.08);
+    border:1px dashed rgba(255,255,255,.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;
+  }
+  .tray .slot.filled{
+    border-style:solid;
+    border-color:var(--neon-cyan);
+    background:rgba(51,228,255,.15);
+  }
+
+  .message{
+    position:absolute;
+    left:50%; top:130px;
+    transform:translateX(-50%);
+    font-size:18px;
+    color:var(--neon-yellow);
+    text-shadow:0 0 6px rgba(255,233,77,.6);
+    background:rgba(13,10,36,.5);
+    padding:4px 12px;
+    border-radius:20px;
+    white-space:nowrap;
+    z-index:4;
+  }
+
+  .clear-banner{
+    position:absolute;
+    inset:0;
+    background:rgba(10,7,30,.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:14px;
+    text-align:center;
+    z-index:10;
+  }
+  .clear-banner.show{display:flex;}
+  .clear-banner h2{
+    margin:0;
+    font-size:24px;
+    color:var(--neon-pink);
+    text-shadow:0 0 10px var(--neon-pink);
+  }
+  .clear-banner button{
+    padding:10px 22px;
+    border-radius:24px;
+    border:none;
+    background:var(--neon-cyan);
+    color:#0d0a24;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+
+  .controls{
+    margin-top:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+  }
+  .ctrl-btn{
+    width:64px;height:64px;
+    border-radius:50%;
+    border:none;
+    background:radial-gradient(circle at 35% 30%, #4a4370, #221c42);
+    color:var(--paper);
+    font-size:22px;
+    box-shadow:0 5px 0 #14102b, 0 8px 14px rgba(0,0,0,.4);
+    cursor:pointer;
+    transition:transform .05s ease;
+  }
+  .ctrl-btn:active{
+    transform:translateY(4px);
+    box-shadow:0 1px 0 #14102b, 0 3px 6px rgba(0,0,0,.4);
+  }
+  .ctrl-btn.down{
+    width:110px;
+    border-radius:34px;
+    background:radial-gradient(circle at 35% 30%, #ff6fb4, var(--neon-pink));
+    color:#2b1030;
+    font-weight:700;
+    font-size:16px;
+    box-shadow:0 5px 0 #a01a5c, 0 8px 14px rgba(0,0,0,.4);
+  }
+  .ctrl-btn.down:active{
+    box-shadow:0 1px 0 #a01a5c, 0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .hint{
+    text-align:center;
+    margin-top:10px;
+    font-size:11px;
+    letter-spacing:.05em;
+    color:rgba(255,248,236,.55);
+  }
+</style>
+</head>
+<body>
+
+<div class="cabinet">
+  <div class="marquee">
+    <h1>ことば クレーンゲーム</h1>
+    
+  </div>
+
+  <div class="question-panel">
+    <div class="avatar-wrap">
+      <img id="avatar" src="normal.png" alt="おねえさん">
+    </div>
+    <div class="speech">
+      <span id="questionText">よみこみちゅう…</span>
+      
+    </div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="rail"></div>
+    <div class="claw-unit" id="claw">
+      <div class="rope" id="rope" style="height:0px;"></div>
+      <div class="hook" id="hook">
+        <div class="knuckle"></div>
+        <div class="arm l"></div>
+        <div class="arm r"></div>
+      </div>
+    </div>
+    <div class="floor"></div>
+    <div id="cardsLayer"></div>
+
+    <div class="tray">
+      <h3>せいかい</h3>
+      <div class="slots" id="slots"></div>
+    </div>
+
+    <div class="message" id="message">← → で うごかす／「つかむ」で ゲット</div>
+
+    <div class="clear-banner" id="clearBanner">
+      <h2>ぜんぶ せいかい！ おめでとう！</h2>
+      <button id="retryBtn">もう いちど あそぶ</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="btnLeft" aria-label="左へ">◀</button>
+    <button class="ctrl-btn down" id="btnDown" aria-label="つかむ">つかむ</button>
+    <button class="ctrl-btn" id="btnRight" aria-label="右へ">▶</button>
+  </div>
+  <div class="hint">キーボードでも操作できます：← → キーで移動、↓ キーか スペースキーで「つかむ」</div>
+</div>
+
+<script>
+(function(){
+  const WORDS = [
+    {text:"ありがとう", color:"#ffd6e8", question:"手伝ってもらったときは なんていう？"},
+    {text:"ごめんなさい", color:"#d6e8ff", question:"悪いことをしたときは なんていう？"},
+    {text:"かわいい",   color:"#fff3c2", question:"小さい子犬を見たときの 気持ちは？"},
+    {text:"くさい",     color:"#d9f5d6", question:"ゴミ箱のにおいをかいだときの 気持ちは？"},
+    {text:"きたない",   color:"#e6d9ff", question:"どろだらけの くつを見たときの 気持ちは？"}
+  ];
+
+  const screen = document.getElementById('screen');
+  const clawUnit = document.getElementById('claw');
+  const rope = document.getElementById('rope');
+  const hook = document.getElementById('hook');
+  const cardsLayer = document.getElementById('cardsLayer');
+  const slotsEl = document.getElementById('slots');
+  const messageEl = document.getElementById('message');
+  const clearBanner = document.getElementById('clearBanner');
+  const questionText = document.getElementById('questionText');
+  const avatar = document.getElementById('avatar');
+  const FACE_IMAGES = {
+    neutral: 'normal.png',
+    smile: 'smile.png',
+    cry: 'sad.png'
+  };
+
+  const RAIL_Y = 30;
+  const FLOOR_TOP = 300 - 58 + 10;
+  const MIN_X = 50;
+  let MAX_X = 580;
+
+  let clawX = 300;
+  let leftHeld = false, rightHeld = false;
+  const MOVE_SPEED = 4.2;
+  let busy = false;
+  let cardEls = []; // {el, word, x, taken}
+  let questionQueue = [];
+  let qIndex = 0;
+  let solvedCount = 0;
+
+  function layoutBounds(){
+    const w = screen.clientWidth;
+    MAX_X = w - 60;
+  }
+
+  function buildSlots(){
+    slotsEl.innerHTML = "";
+    WORDS.forEach(w=>{
+      const s = document.createElement('div');
+      s.className = 'slot';
+      s.dataset.word = w.text;
+      slotsEl.appendChild(s);
+    });
+  }
+
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function placeCards(){
+    cardsLayer.innerHTML = "";
+    cardEls = [];
+    const w = screen.clientWidth;
+    const n = WORDS.length;
+    const usableStart = 60;
+    const usableEnd = w - 60;
+    const span = (usableEnd - usableStart) / (n - 1);
+
+    const order = shuffle(WORDS);
+
+    order.forEach((word,i)=>{
+      const x = usableStart + span*i + (Math.random()*16-8);
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.style.background = word.color;
+      el.style.left = x + 'px';
+      el.style.transform = 'translateX(-50%)';
+      el.textContent = word.text;
+      cardsLayer.appendChild(el);
+      cardEls.push({el, word: word.text, x, taken:false});
+    });
+  }
+
+  function setMessage(t){
+    messageEl.textContent = t;
+  }
+
+  function setFace(state){
+    // state: 'neutral' | 'smile' | 'cry'
+    avatar.src = FACE_IMAGES[state] || FACE_IMAGES.neutral;
+  }
+
+  function currentQuestion(){
+    return questionQueue[qIndex];
+  }
+
+  function showQuestion(){
+    const q = currentQuestion();
+    if(!q){
+      return;
+    }
+    questionText.textContent = q.question;
+    setFace('neutral');
+  }
+
+  function updateClawPosition(){
+    clawX = Math.max(MIN_X, Math.min(MAX_X, clawX));
+    clawUnit.style.left = clawX + 'px';
+  }
+
+  function tick(){
+    if(!busy){
+      if(leftHeld) clawX -= MOVE_SPEED;
+      if(rightHeld) clawX += MOVE_SPEED;
+      updateClawPosition();
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  function setRopeHeight(h, duration){
+    rope.style.transition = `height ${duration}ms ease`;
+    rope.style.height = h + 'px';
+  }
+
+  function wait(ms){
+    return new Promise(res=>setTimeout(res,ms));
+  }
+
+  async function doGrab(){
+    if(busy) return;
+    if(solvedCount >= WORDS.length) return;
+    busy = true;
+    setMessage('うごいて つかんでいます...');
+
+    const dropHeight = FLOOR_TOP - RAIL_Y - 10;
+
+    setRopeHeight(dropHeight, 620);
+    await wait(660);
+
+    let target = null;
+    for(const c of cardEls){
+      if(c.taken) continue;
+      if(Math.abs(c.x - clawX) < 30){
+        target = c;
+        break;
+      }
+    }
+
+    clawUnit.classList.add('grabbing');
+    await wait(200);
+
+    setRopeHeight(0, 620);
+    if(target){
+      target.el.style.transition = 'left .62s ease, top .62s ease, bottom .62s ease';
+      target.el.style.bottom = 'auto';
+      target.el.style.top = (RAIL_Y + 30) + 'px';
+      target.el.style.left = clawX + 'px';
+    }
+    await wait(660);
+
+    if(!target){
+      setMessage('カードに とどかなかった…もういちど！');
+      clawUnit.classList.remove('grabbing');
+      busy = false;
+      return;
+    }
+
+    const q = currentQuestion();
+    const correct = target.word === q.text;
+
+    if(correct){
+      setFace('smile');
+      setMessage('せいかい！「' + target.word + '」で あってるよ！');
+      target.taken = true;
+
+      const trayX = screen.clientWidth - 60;
+      const trayY = 16;
+      clawX = trayX;
+      updateClawPosition();
+      target.el.style.left = trayX + 'px';
+      target.el.style.top = trayY + 'px';
+      await wait(620);
+
+      target.el.classList.add('gone');
+      const slot = slotsEl.querySelector('.slot[data-word="'+CSS.escape(target.word)+'"]');
+      if(slot){
+        slot.classList.add('filled');
+        slot.textContent = '★';
+      }
+      solvedCount++;
+      await wait(150);
+
+      clawUnit.classList.remove('grabbing');
+
+      if(solvedCount >= WORDS.length){
+        clearBanner.classList.add('show');
+        setMessage('コンプリート！');
+        setFace('smile');
+        busy = true;
+        return;
+      }
+
+      qIndex++;
+      showQuestion();
+      busy = false;
+    } else {
+      setFace('cry');
+      setMessage('ちがうよ…「' + target.word + '」は べつの こたえ。もういちど！');
+
+      // drop card back to its original spot
+      target.el.style.top = 'auto';
+      target.el.style.bottom = '12px';
+      target.el.style.left = target.x + 'px';
+      await wait(650);
+
+      clawUnit.classList.remove('grabbing');
+      await wait(500);
+      setFace('neutral');
+      busy = false;
+    }
+  }
+
+  function resetGame(){
+    busy = false;
+    solvedCount = 0;
+    qIndex = 0;
+    clawX = 300;
+    clearBanner.classList.remove('show');
+    setRopeHeight(0,0);
+    clawUnit.classList.remove('grabbing');
+    setFace('neutral');
+    buildSlots();
+    layoutBounds();
+    placeCards();
+    updateClawPosition();
+    questionQueue = shuffle(WORDS);
+    showQuestion();
+    setMessage('← → で うごかす／「つかむ」で ゲット');
+  }
+
+  const btnLeft = document.getElementById('btnLeft');
+  const btnRight = document.getElementById('btnRight');
+  const btnDown = document.getElementById('btnDown');
+  const retryBtn = document.getElementById('retryBtn');
+
+  function pressStart(dir){
+    if(dir==='left') leftHeld = true;
+    if(dir==='right') rightHeld = true;
+  }
+  function pressEnd(dir){
+    if(dir==='left') leftHeld = false;
+    if(dir==='right') rightHeld = false;
+  }
+
+  btnLeft.addEventListener('mousedown', ()=>pressStart('left'));
+  btnLeft.addEventListener('mouseup', ()=>pressEnd('left'));
+  btnLeft.addEventListener('mouseleave', ()=>pressEnd('left'));
+  btnLeft.addEventListener('touchstart', e=>{e.preventDefault();pressStart('left');},{passive:false});
+  btnLeft.addEventListener('touchend', e=>{e.preventDefault();pressEnd('left');});
+
+  btnRight.addEventListener('mousedown', ()=>pressStart('right'));
+  btnRight.addEventListener('mouseup', ()=>pressEnd('right'));
+  btnRight.addEventListener('mouseleave', ()=>pressEnd('right'));
+  btnRight.addEventListener('touchstart', e=>{e.preventDefault();pressStart('right');},{passive:false});
+  btnRight.addEventListener('touchend', e=>{e.preventDefault();pressEnd('right');});
+
+  btnDown.addEventListener('click', doGrab);
+  retryBtn.addEventListener('click', resetGame);
+
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowLeft'){ pressStart('left'); e.preventDefault(); }
+    if(e.key === 'ArrowRight'){ pressStart('right'); e.preventDefault(); }
+    if(e.key === 'ArrowDown' || e.key === ' '){ doGrab(); e.preventDefault(); }
+  });
+  window.addEventListener('keyup', (e)=>{
+    if(e.key === 'ArrowLeft'){ pressEnd('left'); }
+    if(e.key === 'ArrowRight'){ pressEnd('right'); }
+  });
+
+  window.addEventListener('resize', ()=>{
+    layoutBounds();
+  });
+
+  resetGame();
+})();
+</script>
+
+</body>
+</html>

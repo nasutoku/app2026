@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>動物の鳴き声選択</title>
+ <style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    background: #f9f9f9;
+  }
+  .container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    max-width: 900px;
+    margin: 40px auto;
+  }
+  .animal {
+    width: 180px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .animal:hover {
+    transform: scale(1.05);
+  }
+  img {
+    max-width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<h1>好きな動物を選んでね</h1>
+
+<div class="container">
+  <div class="animal" onclick="playSound('dogSound')">
+    <img src="./dog.png" alt="犬">
+    <p>犬</p>
+  </div>
+
+  <div class="animal" onclick="playSound('catSound')">
+    <img src="./cat.png" alt="猫">
+    <p>猫</p>
+  </div>
+
+  <div class="animal" onclick="playSound('sheepSound')">
+    <img src="./sheep.png" alt="ひつじ">
+    <p>ひつじ</p>
+  </div>
+
+  <div class="animal" onclick="playSound('horseSound')">
+    <img src="./horse.png" alt="馬">
+    <p>馬</p>
+  </div>
+</div>
+
+<!-- 音声ファイル -->
+<audio id="dogSound" src="./dog.mp3"></audio>
+<audio id="catSound" src="./cat.mp3"></audio>
+<audio id="sheepSound" src="./sheep.mp3"></audio>
+<audio id="horseSound" src="./horse.mp3"></audio>
+
+<script>
+  function playSound(id) {
+    const audios = document.querySelectorAll("audio");
+    audios.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    document.getElementById(id).play();
+  }
+</script>
+
+</body>
+</html>

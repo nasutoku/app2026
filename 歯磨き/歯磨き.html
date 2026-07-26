@@ -1,0 +1,137 @@
+
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>歯みがき</title>
+
+<style>
+body {
+  text-align: center;
+  background-color: #e0f7fa;
+}
+
+img {
+  width: 250px;
+  margin-top: 20px;
+}
+
+#count {
+  font-size: 60px;
+  margin: 20px;
+}
+
+#big {
+  font-size: 100px;
+  color: orange;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🦷 歯みがきしよう</h1>
+
+<!-- ✅ これ絶対必要 -->
+<img id="toothImage" src="歯磨き1.png">
+
+<div id="big"></div>
+<div id="count">スタートを押してね</div>
+
+<button onclick="start()">スタート</button>
+
+<script>
+let imgNum = 1;
+let count = 1;
+let timer;
+
+// ピッ音
+function beep(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator();
+  o.frequency.value = 800;
+  o.connect(ctx.destination);
+  o.start();
+  setTimeout(()=>o.stop(),100);
+}
+
+// ベル音
+function bell(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator();
+  o.type = "triangle";
+  o.frequency.value = 600;
+  o.connect(ctx.destination);
+  o.start();
+  setTimeout(()=>o.stop(),400);
+}
+
+// 音声
+function speak(){
+  const msg = new SpeechSynthesisUtterance("仕上げお願いします");
+  msg.lang = "ja-JP";
+  speechSynthesis.speak(msg);
+}
+
+// スタート
+function start(){
+  imgNum = 1;
+  count = 1;
+  nextStep();
+}
+
+// 次のステップ
+function nextStep(){
+
+  // ✅ 数字だけ1秒表示
+  document.getElementById("big").textContent = imgNum;
+  document.getElementById("toothImage").style.display = "none";
+
+  setTimeout(()=>{
+    document.getElementById("big").textContent = "";
+    document.getElementById("toothImage").style.display = "block";
+    document.getElementById("toothImage").src = "歯磨き" + imgNum + ".png";
+
+    count = 1;
+    document.getElementById("count").textContent = count;
+
+    clearInterval(timer);
+
+    timer = setInterval(()=>{
+      count++;
+
+      
+if(count < 20){
+  beep();          // 1〜19はピッ
+} else if(count == 20){
+  bell();          // 20でベル
+}
+
+document.getElementById("count").textContent = count;
+
+if(count > 20){
+
+        clearInterval(timer);
+        imgNum++;
+
+        if(imgNum <= 8){
+          nextStep(); // 次の画像へ
+        } else {
+          // ✅ 最後
+          document.getElementById("toothImage").src = "歯磨き9.png";
+          document.getElementById("count").textContent = "おしまい";
+          speak();
+        }
+      }
+
+    },1000);
+
+  },1000);
+}
+</script>
+
+</body>
+</html>
+

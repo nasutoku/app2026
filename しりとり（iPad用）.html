@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>しりとりあそび</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F2F6FF;
+    --bg2: #E8F3FF;
+    --coral: #FF6F91;
+    --coral-deep: #E8547A;
+    --sky: #35B4C4;
+    --sun: #FFC93C;
+    --grass: #4CAF82;
+    --ink: #263457;
+    --ink-soft: #5C6889;
+    --card: #FFFFFF;
+    --line: #DDE6FA;
+    --shadow: 0 10px 24px rgba(38,52,87,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Zen Maru Gothic', sans-serif;
+    background:
+      radial-gradient(circle at 8% 12%, rgba(255,201,60,0.20) 0, transparent 40%),
+      radial-gradient(circle at 92% 85%, rgba(53,180,196,0.18) 0, transparent 45%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:20px 14px 60px;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:640px;
+  }
+  header{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  header h1{
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:32px;
+    margin:0;
+    color:var(--ink);
+    letter-spacing:2px;
+    text-shadow: 3px 3px 0 rgba(255,201,60,0.55);
+  }
+  header p{
+    margin:6px 0 0;
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+
+  .scoreboard{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .pill{
+    background:var(--card);
+    border-radius:999px;
+    padding:8px 16px;
+    font-size:13px;
+    font-weight:700;
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .pill.player{color:var(--coral-deep);}
+  .pill.bot{color:var(--sky);}
+
+  /* --- Connector: signature element showing kana handoff --- */
+  .connector{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin:0 auto 16px;
+    min-height:64px;
+  }
+  .kana-node{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:var(--card);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:26px;
+    box-shadow:var(--shadow);
+    border:3px solid var(--line);
+    transition:all .25s ease;
+  }
+  .kana-node.active{
+    border-color:var(--sun);
+    background:#FFF7E0;
+    transform:scale(1.08);
+  }
+  .kana-node.match{border-color:var(--grass); background:#E9FBF2; color:var(--grass);}
+  .kana-node.bad{border-color:var(--coral); background:#FFECEF; color:var(--coral-deep); animation:shake .35s;}
+  .connector-track{
+    flex:1;
+    max-width:120px;
+    height:3px;
+    background:repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px);
+    position:relative;
+  }
+  .connector-hint{
+    text-align:center;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:-8px 0 16px;
+  }
+  .connector-hint b{color:var(--coral-deep); font-size:15px;}
+
+  /* --- Stage card --- */
+  .stage{
+    background:var(--card);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    padding:28px 20px 22px;
+    text-align:center;
+    margin-bottom:18px;
+    position:relative;
+    overflow:hidden;
+  }
+  .stage::before{
+    content:"";
+    position:absolute; top:-40px; right:-40px;
+    width:120px;height:120px;border-radius:50%;
+    background:rgba(255,201,60,0.18);
+  }
+  .stage-tag{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    padding:4px 12px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .stage-tag.player{background:#FFE3EA; color:var(--coral-deep);}
+  .stage-tag.bot{background:#DEF6F8; color:var(--sky);}
+  .stage-emoji{
+    font-size:76px;
+    line-height:1;
+    margin:6px 0 10px;
+    filter:drop-shadow(0 8px 10px rgba(38,52,87,0.15));
+  }
+  .stage-word{
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:34px;
+    letter-spacing:3px;
+    color:var(--ink);
+  }
+  .stage-word .lastchar{color:var(--coral-deep);}
+
+  .thinking{
+    color:var(--ink-soft);
+    font-size:14px;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--sky); animation:bounce 1s infinite;}
+  .dot:nth-child(2){animation-delay:.15s;}
+  .dot:nth-child(3){animation-delay:.3s;}
+
+  /* --- Chain history --- */
+  .chain-wrap{
+    margin-bottom:18px;
+  }
+  .chain-label{
+    font-size:12px; color:var(--ink-soft); margin:0 0 8px 4px; font-weight:700;
+  }
+  .chain{
+    display:flex;
+    gap:0;
+    overflow-x:auto;
+    padding:6px 2px 12px;
+    scrollbar-width:thin;
+  }
+  .chain-item{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+  }
+  .chain-card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:8px 10px;
+    text-align:center;
+    min-width:64px;
+  }
+  .chain-card .em{font-size:22px;}
+  .chain-card .wd{font-size:11px; font-family:'Kosugi Maru',sans-serif; color:var(--ink-soft); margin-top:2px; white-space:nowrap;}
+  .chain-card.by-player{border:2px solid var(--coral);}
+  .chain-card.by-bot{border:2px solid var(--sky);}
+  .link{
+    font-size:16px;
+    color:#C6D2EE;
+    margin:0 4px;
+  }
+
+  /* --- Input area --- */
+  .input-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  input[type="text"]{
+    flex:1;
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:20px;
+    padding:14px 16px;
+    border-radius:16px;
+    border:2px solid var(--line);
+    outline:none;
+    background:var(--card);
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  input[type="text"]:focus{border-color:var(--sun);}
+  button{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
+    border-radius:16px;
+  }
+  .btn-submit{
+    background:var(--coral);
+    color:white;
+    padding:0 22px;
+    font-size:16px;
+    box-shadow:0 6px 0 var(--coral-deep);
+    transition:transform .08s;
+  }
+  .btn-submit:active{transform:translateY(4px); box-shadow:0 2px 0 var(--coral-deep);}
+  .btn-submit:disabled{background:#CBD3E6; box-shadow:0 6px 0 #A9B3CC; cursor:default;}
+  .kb-key:disabled, .kb-action:disabled, .btn-hint:disabled{
+    opacity:0.4; cursor:not-allowed;
+  }
+
+  .util-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:6px 10px;
+    border-radius:10px;
+  }
+  .btn-ghost:hover{background:rgba(38,52,87,0.06);}
+  .btn-hint{
+    background:#FFF3D0;
+    color:#9A6B00;
+    font-size:13px;
+    padding:8px 14px;
+  }
+
+  .btn-mic{
+    width:52px;
+    flex:0 0 52px;
+    background:var(--sky);
+    color:white;
+    font-size:20px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 0 #278A96;
+  }
+  .btn-mic:active{transform:translateY(4px); box-shadow:0 2px 0 #278A96;}
+  .btn-mic.listening{
+    background:var(--coral);
+    box-shadow:0 6px 0 var(--coral-deep);
+    animation:mic-pulse 1s infinite;
+  }
+  .btn-mic:disabled{background:#CBD3E6; box-shadow:0 6px 0 #A9B3CC; cursor:not-allowed;}
+  @keyframes mic-pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+  }
+  .voice-status{
+    text-align:center;
+    font-size:12px;
+    color:var(--sky);
+    font-weight:700;
+    min-height:16px;
+    margin-bottom:4px;
+  }
+
+  /* --- Hint popup --- */
+  .hint-card{
+    display:none;
+    align-items:center;
+    gap:12px;
+    background:#FFF7E0;
+    border:2px dashed var(--sun);
+    border-radius:18px;
+    padding:12px 16px;
+    margin:0 0 14px;
+    box-shadow:var(--shadow);
+  }
+  .hint-card.show{
+    display:flex;
+    animation:hint-pop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .hint-card .hint-emoji{
+    font-size:40px;
+    line-height:1;
+    flex:0 0 auto;
+  }
+  .hint-card .hint-text{
+    flex:1;
+    font-size:14px;
+    color:#8A6300;
+    font-weight:700;
+    line-height:1.5;
+  }
+  .hint-card .hint-close{
+    flex:0 0 auto;
+    background:transparent;
+    color:#B08800;
+    font-size:18px;
+    padding:4px 8px;
+    border-radius:8px;
+  }
+  .hint-card .hint-close:hover{background:rgba(176,136,0,0.12);}
+  @keyframes hint-pop{
+    0%{transform:scale(0.5) translateY(10px); opacity:0;}
+    70%{transform:scale(1.05) translateY(-2px); opacity:1;}
+    100%{transform:scale(1) translateY(0); opacity:1;}
+  }
+  @keyframes hint-shake{
+    0%,100%{transform:translateX(0) scale(1);}
+    50%{transform:translateX(-3px) scale(1.02);}
+  }
+
+  /* --- Touch keyboard --- */
+  .keyboard-wrap{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    padding:12px;
+    margin:10px 0 14px;
+  }
+  .kb-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:10px;
+  }
+  .kb-tab{
+    flex:1;
+    background:var(--bg2);
+    color:var(--ink-soft);
+    font-size:12px;
+    font-weight:700;
+    padding:8px 4px;
+    border-radius:10px;
+  }
+  .kb-tab.active{
+    background:var(--sun);
+    color:var(--ink);
+  }
+  .kb-panel{
+    display:none;
+    grid-template-columns:repeat(5, 1fr);
+    gap:6px;
+  }
+  .kb-panel.active{display:grid;}
+  .kb-key{
+    background:var(--bg2);
+    color:var(--ink);
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:18px;
+    padding:10px 0;
+    border-radius:10px;
+    transition:transform .06s;
+  }
+  .kb-key:active{transform:scale(0.9); background:#FFE9C7;}
+  .kb-key.empty{visibility:hidden; pointer-events:none;}
+  .kb-actions{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+  }
+  .kb-action{
+    flex:1;
+    background:#EFE9FF;
+    color:#6A4FCF;
+    font-size:13px;
+    padding:10px 0;
+  }
+  .kb-action.danger{background:#FFE3EA; color:var(--coral-deep);}
+
+  .message{
+    text-align:center;
+    font-size:13px;
+    min-height:20px;
+    margin:10px 0 4px;
+    color:var(--coral-deep);
+    font-weight:700;
+  }
+  .message.ok{color:var(--grass);}
+  .message.checking{color:var(--sky);}
+
+  /* --- Online-lookup badge --- */
+  .stage{position:relative;}
+  .net-badge{
+    position:absolute;
+    top:14px; left:14px;
+    background:var(--sky);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+    display:flex; align-items:center; gap:3px;
+    box-shadow:var(--shadow);
+  }
+  .chain-card{position:relative;}
+  .chain-card .net-mini{
+    position:absolute; top:-6px; right:-6px;
+    background:var(--sky);
+    color:#fff;
+    font-size:9px;
+    width:16px;height:16px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stage-emoji.unknown{font-size:60px; opacity:.55;}
+
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-5px);}
+    75%{transform:translateX(5px);}
+  }
+  @keyframes bounce{
+    0%,80%,100%{transform:translateY(0); opacity:.5;}
+    40%{transform:translateY(-5px); opacity:1;}
+  }
+  @keyframes pop{
+    0%{transform:scale(0.6); opacity:0;}
+    60%{transform:scale(1.06);}
+    100%{transform:scale(1); opacity:1;}
+  }
+  .pop{animation:pop .35s ease;}
+
+  /* --- Game over overlay --- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(38,52,87,0.55);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    z-index:10;
+  }
+  .overlay-card{
+    background:var(--card);
+    border-radius:26px;
+    padding:32px 26px;
+    max-width:360px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+  .overlay-card .big-emoji{font-size:56px; margin-bottom:8px;}
+  .n-stamp{
+    display:none;
+    width:100px;height:100px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    border:5px solid var(--coral-deep);
+    color:var(--coral-deep);
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    transform:rotate(-14deg);
+    animation:stamp-in .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .n-stamp.show{display:flex;}
+  .n-stamp .n-char{
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:34px;
+    line-height:1;
+  }
+  .n-stamp .n-label{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:2px;
+    margin-top:2px;
+  }
+  @keyframes stamp-in{
+    0%{transform:rotate(-14deg) scale(2.2); opacity:0;}
+    60%{opacity:1;}
+    100%{transform:rotate(-14deg) scale(1); opacity:1;}
+  }
+  .overlay-btn-row{
+    display:flex;
+    gap:10px;
+  }
+  .overlay-btn-row button{flex:1;}
+  .btn-finish{
+    background:var(--card);
+    color:var(--ink-soft);
+    font-size:15px;
+    padding:12px 10px;
+    border:2px solid var(--line);
+  }
+  .btn-finish:active{transform:translateY(2px);}
+  .overlay-card h2{
+    font-family:'Kosugi Maru', sans-serif;
+    font-size:24px;
+    margin:0 0 8px;
+  }
+  .overlay-card p{color:var(--ink-soft); font-size:14px; margin:0 0 20px; line-height:1.6;}
+  .overlay-card .score-big{font-size:15px; margin-bottom:18px; color:var(--ink);}
+  .overlay-card .score-big b{color:var(--coral-deep); font-size:20px;}
+  .btn-restart{
+    background:var(--grass);
+    color:white;
+    font-size:16px;
+    padding:12px 28px;
+    box-shadow:0 6px 0 #2F8560;
+  }
+  .btn-restart:active{transform:translateY(4px); box-shadow:0 2px 0 #2F8560;}
+
+  @media (max-width:420px){
+    header h1{font-size:26px;}
+    .stage-word{font-size:26px;}
+    .stage-emoji{font-size:60px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>🔗 しりとりあそび</h1>
+    <p>さいごの もじから はじまる ことばを つなげよう！<br>じしょに ある ことばなら なんでも つかえるよ（インターネット せつぞく ひつよう）</p>
+  </header>
+
+  <div class="scoreboard">
+    <div class="pill player">🧒 きみ <span id="playerScore">0</span>こ</div>
+    <div class="pill bot">🤖 あいて <span id="botScore">0</span>こ</div>
+  </div>
+
+  <div class="connector">
+    <div class="kana-node" id="nodeFrom">ー</div>
+    <div class="connector-track"></div>
+    <div class="kana-node" id="nodeTo">？</div>
+  </div>
+  <div class="connector-hint" id="connectorHint">まずは ゲームを はじめよう</div>
+
+  <div class="stage" id="stage">
+    <span class="stage-tag bot" id="stageTag">さいしょの ことば</span>
+    <div class="stage-emoji" id="stageEmoji">🎴</div>
+    <div class="stage-word" id="stageWord">スタート</div>
+  </div>
+
+  <div class="chain-wrap">
+    <p class="chain-label">これまでの チェーン</p>
+    <div class="chain" id="chain"></div>
+  </div>
+
+  <div class="input-row">
+    <button class="btn-mic" id="micBtn" title="おんせいにゅうりょく">🎤</button>
+    <input type="text" id="wordInput" placeholder="にゅうりょく（キーボード・タッチ・マイク）" autocomplete="off" />
+    <button class="btn-submit" id="submitBtn">きめる！</button>
+  </div>
+  <div class="voice-status" id="voiceStatus"></div>
+  <div class="message" id="message"></div>
+
+  <div class="keyboard-wrap">
+    <div class="kb-tabs">
+      <button class="kb-tab active" data-tab="main">あ〜わ行</button>
+      <button class="kb-tab" data-tab="daku">が゛ ぱ゜</button>
+      <button class="kb-tab" data-tab="small">ゃゅょ っ</button>
+    </div>
+
+    <div class="kb-panel active" id="kbMain">
+      <button class="kb-key" data-c="あ">あ</button><button class="kb-key" data-c="い">い</button><button class="kb-key" data-c="う">う</button><button class="kb-key" data-c="え">え</button><button class="kb-key" data-c="お">お</button>
+      <button class="kb-key" data-c="か">か</button><button class="kb-key" data-c="き">き</button><button class="kb-key" data-c="く">く</button><button class="kb-key" data-c="け">け</button><button class="kb-key" data-c="こ">こ</button>
+      <button class="kb-key" data-c="さ">さ</button><button class="kb-key" data-c="し">し</button><button class="kb-key" data-c="す">す</button><button class="kb-key" data-c="せ">せ</button><button class="kb-key" data-c="そ">そ</button>
+      <button class="kb-key" data-c="た">た</button><button class="kb-key" data-c="ち">ち</button><button class="kb-key" data-c="つ">つ</button><button class="kb-key" data-c="て">て</button><button class="kb-key" data-c="と">と</button>
+      <button class="kb-key" data-c="な">な</button><button class="kb-key" data-c="に">に</button><button class="kb-key" data-c="ぬ">ぬ</button><button class="kb-key" data-c="ね">ね</button><button class="kb-key" data-c="の">の</button>
+      <button class="kb-key" data-c="は">は</button><button class="kb-key" data-c="ひ">ひ</button><button class="kb-key" data-c="ふ">ふ</button><button class="kb-key" data-c="へ">へ</button><button class="kb-key" data-c="ほ">ほ</button>
+      <button class="kb-key" data-c="ま">ま</button><button class="kb-key" data-c="み">み</button><button class="kb-key" data-c="む">む</button><button class="kb-key" data-c="め">め</button><button class="kb-key" data-c="も">も</button>
+      <button class="kb-key" data-c="や">や</button><button class="kb-key empty"></button><button class="kb-key" data-c="ゆ">ゆ</button><button class="kb-key empty"></button><button class="kb-key" data-c="よ">よ</button>
+      <button class="kb-key" data-c="ら">ら</button><button class="kb-key" data-c="り">り</button><button class="kb-key" data-c="る">る</button><button class="kb-key" data-c="れ">れ</button><button class="kb-key" data-c="ろ">ろ</button>
+      <button class="kb-key" data-c="わ">わ</button><button class="kb-key empty"></button><button class="kb-key" data-c="を">を</button><button class="kb-key empty"></button><button class="kb-key" data-c="ん">ん</button>
+    </div>
+
+    <div class="kb-panel" id="kbDaku">
+      <button class="kb-key" data-c="が">が</button><button class="kb-key" data-c="ぎ">ぎ</button><button class="kb-key" data-c="ぐ">ぐ</button><button class="kb-key" data-c="げ">げ</button><button class="kb-key" data-c="ご">ご</button>
+      <button class="kb-key" data-c="ざ">ざ</button><button class="kb-key" data-c="じ">じ</button><button class="kb-key" data-c="ず">ず</button><button class="kb-key" data-c="ぜ">ぜ</button><button class="kb-key" data-c="ぞ">ぞ</button>
+      <button class="kb-key" data-c="だ">だ</button><button class="kb-key" data-c="ぢ">ぢ</button><button class="kb-key" data-c="づ">づ</button><button class="kb-key" data-c="で">で</button><button class="kb-key" data-c="ど">ど</button>
+      <button class="kb-key" data-c="ば">ば</button><button class="kb-key" data-c="び">び</button><button class="kb-key" data-c="ぶ">ぶ</button><button class="kb-key" data-c="べ">べ</button><button class="kb-key" data-c="ぼ">ぼ</button>
+      <button class="kb-key" data-c="ぱ">ぱ</button><button class="kb-key" data-c="ぴ">ぴ</button><button class="kb-key" data-c="ぷ">ぷ</button><button class="kb-key" data-c="ぺ">ぺ</button><button class="kb-key" data-c="ぽ">ぽ</button>
+    </div>
+
+    <div class="kb-panel" id="kbSmall">
+      <button class="kb-key" data-c="ゃ">ゃ</button><button class="kb-key" data-c="ゅ">ゅ</button><button class="kb-key" data-c="ょ">ょ</button><button class="kb-key" data-c="っ">っ</button><button class="kb-key" data-c="ー">ー</button>
+      <button class="kb-key" data-c="ぁ">ぁ</button><button class="kb-key" data-c="ぃ">ぃ</button><button class="kb-key" data-c="ぅ">ぅ</button><button class="kb-key" data-c="ぇ">ぇ</button><button class="kb-key" data-c="ぉ">ぉ</button>
+    </div>
+
+    <div class="kb-actions">
+      <button class="kb-action" id="kbBack">⌫ もどす</button>
+      <button class="kb-action danger" id="kbClear">🗑 ぜんぶけす</button>
+    </div>
+  </div>
+
+  <div class="hint-card" id="hintCard">
+    <div class="hint-emoji" id="hintEmoji">💡</div>
+    <div class="hint-text" id="hintText">ヒントだよ</div>
+    <button class="hint-close" id="hintClose">✕</button>
+  </div>
+
+  <div class="util-row">
+    <button class="btn-ghost" id="resetBtn">↺ さいしょから</button>
+    <button class="btn-hint" id="hintBtn">💡 ヒント</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" style="display:none;">
+  <div class="overlay-card">
+    <div class="big-emoji" id="overEmoji">🎉</div>
+    <div class="n-stamp" id="nStamp">
+      <span class="n-char">ん</span>
+      <span class="n-label">STOP</span>
+    </div>
+    <h2 id="overTitle">きみの かち！</h2>
+    <p id="overText">あいては つぎの ことばが おもいつかなかったよ。</p>
+    <div class="score-big">つないだ ことば <b id="overScore">0</b> こ</div>
+    <div class="overlay-btn-row">
+      <button class="btn-finish" id="overFinish">ここで おわる</button>
+      <button class="btn-restart" id="overRestart">もういちど あそぶ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------- 単語辞書（ひらがな＋イラスト） ---------------- */
+const DICT = [
+  ["あひる","🦆"],["あり","🐜"],["あめ","🍬"],["いか","🦑"],["いぬ","🐶"],
+  ["いちご","🍓"],["うさぎ","🐰"],["うま","🐴"],["うみ","🌊"],["えんぴつ","✏️"],
+  ["おに","👹"],["おにぎり","🍙"],["かえる","🐸"],["かさ","☂️"],["かに","🦀"],
+  ["かめ","🐢"],["き","🌳"],["きつね","🦊"],["きのこ","🍄"],["きりん","🦒"],
+  ["くじら","🐳"],["くつ","👟"],["くま","🐻"],["くるま","🚗"],["けむし","🐛"],
+  ["こあら","🐨"],["こおり","🧊"],["ごりら","🦍"],["さかな","🐟"],["さくら","🌸"],
+  ["さる","🐵"],["しか","🦌"],["しまうま","🦓"],["すいか","🍉"],["すし","🍣"],
+  ["すずめ","🐦"],["せみ","🦗"],["そら","☁️"],["たいこ","🥁"],["たこ","🐙"],
+  ["たまご","🥚"],["ちきゅう","🌍"],["ちょうちょ","🦋"],["つき","🌙"],["つくし","🌿"],
+  ["てがみ","✉️"],["てんとうむし","🐞"],["とけい","⏰"],["とり","🐦"],["なす","🍆"],
+  ["なつ","☀️"],["にじ","🌈"],["にわとり","🐔"],["にんじん","🥕"],["ねこ","🐱"],
+  ["ねずみ","🐭"],["のみもの","🥤"],["はし","🥢"],["はと","🕊️"],["はな","🌷"],
+  ["ぱん","🍞"],["ひこうき","✈️"],["ひまわり","🌻"],["ふうせん","🎈"],["ふね","🚢"],
+  ["へび","🐍"],["ほし","⭐"],["ほん","📕"],["まつ","🌲"],["みかん","🍊"],
+  ["みず","💧"],["むし","🦟"],["め","👁️"],["めがね","👓"],["もも","🍑"],
+  ["やま","⛰️"],["ゆき","❄️"],["ゆびわ","💍"],["よる","🌃"],["らくだ","🐫"],
+  ["らっぱ","📯"],["りす","🐿️"],["りんご","🍎"],["るす","🚪"],["れもん","🍋"],
+  ["ろうそく","🕯️"],["わに","🐊"],["わたあめ","🍭"]
+];
+const DICT_MAP = new Map(DICT.map(([w,e])=>[w,e]));
+
+/* =====================================================================
+   オンライン辞書（jisho.org）を使った「なんでもことば」判定
+   - あいて（CPU）は、これまでどおり ローカルの単語リストから えらぶ
+     （はやくて、絵と単語の対応が確実なため）
+   - きみ（プレイヤー）が入力した ことばは、ローカル辞書に なければ
+     オンラインの国語辞書（jisho.org）に といあわせて「本物の言葉か」を
+     確認する。イラストは 対応する絵文字が見つかったときだけ表示し、
+     見つからなければ「❓」を表示する。
+   ===================================================================== */
+
+/* --- ネットワーク：jisho.org は直接のブラウザからのアクセス(CORS)を
+   許可していないため、CORS対応の中継サーバーを経由して呼び出す --- */
+const CORS_PROXIES = [
+  url => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(url),
+  url => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+  url => "https://corsproxy.io/?url=" + encodeURIComponent(url)
+];
+
+function hiraToKata(str){
+  return str.replace(/[\u3041-\u3096]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+}
+
+async function fetchJishoData(word){
+  const target = "https://jisho.org/api/v1/search/words?keyword=" + encodeURIComponent(word);
+  for(const buildProxyUrl of CORS_PROXIES){
+    try{
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(buildProxyUrl(target), {signal: controller.signal});
+      clearTimeout(timer);
+      if(!res.ok) continue;
+      const text = await res.text();
+      const data = JSON.parse(text);
+      if(data && Array.isArray(data.data)) return data;
+    }catch(e){ /* このプロキシがだめなら次を試す */ }
+  }
+  return null; // すべて失敗 = ネットワークエラー
+}
+
+// 入力された ひらがな と いっちする「見出し語」を辞書データから さがす
+function findMatchingEntry(data, word){
+  if(!data) return null;
+  const kata = hiraToKata(word);
+  for(const entry of data.data){
+    if(!Array.isArray(entry.japanese)) continue;
+    for(const jp of entry.japanese){
+      if(jp.reading === word || jp.reading === kata || jp.word === word){
+        return entry;
+      }
+    }
+  }
+  return null;
+}
+
+// 英語の意味（gloss）から、対応する絵文字を推定する
+function findEmojiForEntry(entry){
+  if(!entry || !Array.isArray(entry.senses)) return null;
+  const phrases = [];
+  for(const sense of entry.senses.slice(0, 4)){
+    if(Array.isArray(sense.english_definitions)){
+      for(const def of sense.english_definitions) phrases.push(def.toLowerCase());
+    }
+  }
+  // まず フレーズ全体で一致を試す（"green tea" のような複合語を優先）
+  for(const p of phrases){
+    const cleaned = p.replace(/\([^)]*\)/g, "").trim();
+    if(EMOJI_MAP[cleaned]) return EMOJI_MAP[cleaned];
+  }
+  // 見つからなければ、単語ごとに分けて一致を試す
+  for(const p of phrases){
+    const cleaned = p.replace(/\([^)]*\)/g, "");
+    const words = cleaned.split(/[^a-z]+/).filter(Boolean);
+    for(const w of words){
+      if(EMOJI_MAP[w]) return EMOJI_MAP[w];
+    }
+  }
+  return null;
+}
+
+// 卑猥・不適切な ことばの自動フィルター（完全一致でチェック）
+const NG_WORDS = new Set([
+  "せっくす","せっくすする","れいぷ","ちんこ","ちんちん","まんこ","おまんこ",
+  "おっぱい","にゅうしゅ","いんけい","ぼっき","しゃせい","じい","じいこうい",
+  "せいこうい","のうこう","えっち","ふうぞく","そーぷ","でりへる","あなる",
+  "ふぇらちお","くんにりんぐす","ようとうふ","ばいしゅん","かんしょく",
+  "しね","しにたい","ころす","ころしたい","じさつ","きちがい","かたわ",
+  "めくら","つんぼ","おし","おかま","ほもやろう","れず"
+]);
+function isBlockedWord(word){
+  return NG_WORDS.has(word);
+}
+
+// 英語の意味（キーワード）→ 絵文字 の対応表（ネットで見つかった単語の
+// イラスト表示に使う。ローカル辞書 DICT にある単語は そちらの絵文字を優先）
+const EMOJI_MAP = {
+  "dog":"🐶","puppy":"🐶","cat":"🐱","kitten":"🐱","mouse":"🐭","rat":"🐭",
+  "hamster":"🐹","rabbit":"🐰","bear":"🐻","panda":"🐼","koala":"🐨",
+  "tiger":"🐯","lion":"🦁","cow":"🐮","cattle":"🐮","pig":"🐷","boar":"🐗",
+  "frog":"🐸","monkey":"🐵","chicken":"🐔","rooster":"🐓","penguin":"🐧",
+  "bird":"🐦","little bird":"🐦","chick":"🐤","eagle":"🦅","duck":"🦆",
+  "owl":"🦉","bat":"🦇","wolf":"🐺","horse":"🐴","unicorn":"🦄","bee":"🐝",
+  "bug":"🐛","caterpillar":"🐛","butterfly":"🦋","snail":"🐌","snake":"🐍",
+  "lizard":"🦎","turtle":"🐢","tortoise":"🐢","scorpion":"🦂","crab":"🦀",
+  "squid":"🦑","octopus":"🐙","shrimp":"🦐","fish":"🐟","tropical fish":"🐠",
+  "blowfish":"🐡","whale":"🐳","dolphin":"🐬","shark":"🦈","crocodile":"🐊",
+  "alligator":"🐊","leopard":"🐆","zebra":"🦓","gorilla":"🦍","elephant":"🐘",
+  "rhinoceros":"🦏","hippopotamus":"🦛","camel":"🐫","llama":"🦙","giraffe":"🦒",
+  "kangaroo":"🦘","goat":"🐐","ram":"🐏","sheep":"🐑","deer":"🦌","dog food":"🐶",
+  "spider":"🕷️","peacock":"🦚","parrot":"🦜","swan":"🦢","flamingo":"🦩",
+  "sloth":"🦥","otter":"🦦","raccoon":"🦝","fox":"🦊","hedgehog":"🦔",
+  "worm":"🪱","cricket":"🦗","mosquito":"🦟","ant":"🐜","ladybug":"🐞",
+  "apple":"🍎","green apple":"🍏","pear":"🍐","orange":"🍊","tangerine":"🍊",
+  "mandarin":"🍊","lemon":"🍋","banana":"🍌","watermelon":"🍉","grape":"🍇",
+  "grapes":"🍇","strawberry":"🍓","melon":"🍈","cherry":"🍒","cherries":"🍒",
+  "peach":"🍑","pineapple":"🍍","kiwi":"🥝","kiwi fruit":"🥝","mango":"🥭",
+  "coconut":"🥥","avocado":"🥑","tomato":"🍅","eggplant":"🍆","aubergine":"🍆",
+  "potato":"🥔","carrot":"🥕","corn":"🌽","hot pepper":"🌶️","chili":"🌶️",
+  "cucumber":"🥒","broccoli":"🥦","mushroom":"🍄","peanuts":"🥜","peanut":"🥜",
+  "chestnut":"🌰","bread":"🍞","croissant":"🥐","baguette":"🥖","pretzel":"🥨",
+  "pancakes":"🥞","cheese":"🧀","egg":"🥚","fried egg":"🍳","bacon":"🥓",
+  "steak":"🥩","meat":"🍖","hamburger":"🍔","fries":"🍟","french fries":"🍟",
+  "pizza":"🍕","hot dog":"🌭","sandwich":"🥪","taco":"🌮","burrito":"🌯",
+  "rice ball":"🍙","rice":"🍚","curry":"🍛","noodle":"🍜","noodles":"🍜",
+  "spaghetti":"🍝","sushi":"🍣","tempura":"🍤","dumpling":"🥟","fortune cookie":"🥠",
+  "oyster":"🦪","soft ice cream":"🍦","shaved ice":"🍧","ice cream":"🍨",
+  "doughnut":"🍩","donut":"🍩","cookie":"🍪","cake":"🎂","shortcake":"🍰",
+  "pie":"🥧","chocolate":"🍫","candy":"🍬","lollipop":"🍭","pudding":"🍮",
+  "honey":"🍯","milk":"🥛","coffee":"☕","tea":"🍵","green tea":"🍵",
+  "sake":"🍶","wine":"🍷","beer":"🍺","juice":"🧃","water":"💧",
+  "tree":"🌳","evergreen tree":"🌲","palm tree":"🌴","cactus":"🌵",
+  "flower":"🌷","tulip":"🌷","rose":"🌹","hibiscus":"🌺","sunflower":"🌻",
+  "cherry blossom":"🌸","blossom":"🌼","seedling":"🌱","herb":"🌿","clover":"🍀",
+  "leaf":"🍁","maple leaf":"🍁","fallen leaf":"🍂","leaves":"🍃",
+  "mountain":"⛰️","volcano":"🌋","desert":"🏜️","beach":"🏖️","island":"🏝️",
+  "sea":"🌊","wave":"🌊","ocean":"🌊","river":"🏞️","forest":"🌳",
+  "sun":"☀️","moon":"🌙","star":"⭐","cloud":"☁️","rainbow":"🌈",
+  "rain":"🌧️","snow":"❄️","snowman":"⛄","lightning":"⚡","fire":"🔥",
+  "ice":"🧊","umbrella":"☂️","wind":"🌬️","tornado":"🌪️","fog":"🌫️",
+  "night":"🌃","sky":"🌌","earth":"🌍","world":"🌍","planet":"🪐",
+  "car":"🚗","taxi":"🚕","bus":"🚌","truck":"🚚","train":"🚃",
+  "bullet train":"🚄","subway":"🚇","tram":"🚊","bicycle":"🚲","motorcycle":"🏍️",
+  "airplane":"✈️","helicopter":"🚁","rocket":"🚀","ship":"🚢","boat":"⛵",
+  "canoe":"🛶","anchor":"⚓","fuel pump":"⛽",
+  "house":"🏠","building":"🏢","school":"🏫","hospital":"🏥","bank":"🏦",
+  "hotel":"🏨","church":"⛪","castle":"🏯","shrine":"⛩️","tent":"⛺",
+  "bridge":"🌉","tower":"🗼","factory":"🏭","stadium":"🏟️",
+  "clock":"⏰","watch":"⌚","hourglass":"⌛","calendar":"📅",
+  "book":"📕","books":"📚","notebook":"📔","pencil":"✏️","pen":"🖊️",
+  "scissors":"✂️","ruler":"📏","envelope":"✉️","letter":"✉️","mailbox":"📫",
+  "phone":"📱","telephone":"☎️","computer":"💻","television":"📺","camera":"📷",
+  "light bulb":"💡","battery":"🔋","key":"🔑","lock":"🔒","hammer":"🔨",
+  "wrench":"🔧","gear":"⚙️","magnet":"🧲","bomb":"💣","gun":"🔫",
+  "knife":"🔪","syringe":"💉","pill":"💊","thermometer":"🌡️",
+  "toilet":"🚽","bathtub":"🛁","shower":"🚿","soap":"🧼","toothbrush":"🪥",
+  "mirror":"🪞","bed":"🛏️","couch":"🛋️","chair":"🪑","door":"🚪",
+  "window":"🪟","shirt":"👕","t-shirt":"👕","dress":"👗","kimono":"👘",
+  "jeans":"👖","socks":"🧦","shoe":"👟","shoes":"👟","boot":"👢",
+  "sandal":"👡","glove":"🧤","scarf":"🧣","hat":"🎩","cap":"🧢",
+  "crown":"👑","glasses":"👓","ring":"💍","bag":"👜","backpack":"🎒",
+  "umbrella hat":"☂️","balloon":"🎈","kite":"🪁","gift":"🎁","present":"🎁",
+  "party popper":"🎉","confetti ball":"🎊","ribbon":"🎀","flag":"🚩",
+  "guitar":"🎸","piano":"🎹","violin":"🎻","drum":"🥁","trumpet":"🎺",
+  "saxophone":"🎷","musical note":"🎵","microphone":"🎤","headphones":"🎧",
+  "ball":"⚽","soccer ball":"⚽","basketball":"🏀","baseball":"⚾","tennis":"🎾",
+  "volleyball":"🏐","football":"🏈","rugby":"🏉","badminton":"🏸","ping pong":"🏓",
+  "bow and arrow":"🏹","fishing pole":"🎣","medal":"🥇","trophy":"🏆",
+  "dice":"🎲","chess":"♟️","kite (toy)":"🪁","top (toy)":"🪀","doll":"🪆",
+  "teddy bear":"🧸","paintbrush":"🖌️","artist palette":"🎨",
+  "sun and rain":"🌦️","eye":"👁️","eyes":"👀","ear":"👂","nose":"👃",
+  "mouth":"👄","tooth":"🦷","tongue":"👅","brain":"🧠","bone":"🦴",
+  "hand":"✋","foot":"🦶","leg":"🦵","muscle":"💪","heart":"❤️",
+  "baby":"👶","boy":"👦","girl":"👧","man":"👨","woman":"👩",
+  "old man":"👴","old woman":"👵","family":"👨‍👩‍👧‍👦","police officer":"👮",
+  "firefighter":"👨‍🚒","doctor":"👨‍⚕️","farmer":"👨‍🌾","cook":"👨‍🍳",
+  "student":"🧑‍🎓","teacher":"🧑‍🏫","artist":"🧑‍🎨","astronaut":"🧑‍🚀",
+  "ghost":"👻","monster":"👹","goblin":"👺","alien":"👽","robot":"🤖",
+  "skull":"💀","angel":"👼","santa claus":"🎅","snowman without snow":"⛄",
+  "sunrise":"🌅","fireworks":"🎆","sparkler":"🎇","christmas tree":"🎄",
+  "number 0":"0️⃣","number 1":"1️⃣","zero":"0️⃣","one":"1️⃣","two":"2️⃣",
+  "three":"3️⃣","four":"4️⃣","five":"5️⃣","six":"6️⃣","seven":"7️⃣",
+  "eight":"8️⃣","nine":"9️⃣","ten":"🔟"
+};
+
+/* ---------------- ゲーム状態 ---------------- */
+let history = [];        // {word, emoji, by:'player'|'bot'}
+let usedWords = new Set();
+let playerScore = 0;
+let botScore = 0;
+let gameOver = false;
+let awaitingBot = false;
+
+const smallMap = {"ゃ":"や","ゅ":"ゆ","ょ":"よ","っ":"つ","ぁ":"あ","ぃ":"い","ぅ":"う","ぇ":"え","ぉ":"お","ゎ":"わ"};
+function normChar(c){ return smallMap[c] || c; }
+function firstKana(w){ return normChar(w[0]); }
+function lastKana(w){ return normChar(w[w.length-1]); }
+function endsWithN(w){ return w[w.length-1] === "ん"; }
+
+/* ---------------- DOM要素 ---------------- */
+const $ = id => document.getElementById(id);
+const stageTag = $("stageTag"), stageEmoji = $("stageEmoji"), stageWord = $("stageWord"), stage = $("stage");
+const nodeFrom = $("nodeFrom"), nodeTo = $("nodeTo"), connectorHint = $("connectorHint");
+const chainEl = $("chain");
+const wordInput = $("wordInput"), submitBtn = $("submitBtn"), messageEl = $("message");
+const overlay = $("overlay"), overEmoji = $("overEmoji"), overTitle = $("overTitle"), overText = $("overText"), overScore = $("overScore"), nStamp = $("nStamp");
+
+function pickStartWord(){
+  const candidates = DICT.filter(([w]) => !endsWithN(w));
+  const pool = candidates.length > 0 ? candidates : DICT;
+  const idx = Math.floor(Math.random() * pool.length);
+  return pool[idx];
+}
+
+function init(){
+  history = [];
+  usedWords = new Set();
+  playerScore = 0;
+  botScore = 0;
+  gameOver = false;
+  awaitingBot = false;
+  overlay.style.display = "none";
+  messageEl.textContent = "";
+  hintCard.classList.remove("show");
+  nStamp.classList.remove("show");
+  overEmoji.style.display = "";
+  wordInput.value = "";
+  wordInput.disabled = false;
+  submitBtn.disabled = false;
+  micBtn.disabled = !SpeechRecognitionAPI ? true : false;
+  $("hintBtn").disabled = false;
+  $("resetBtn").textContent = "↺ さいしょから";
+  document.querySelectorAll(".kb-key, #kbBack, #kbClear").forEach(b => b.disabled = false);
+
+  const [w, e] = pickStartWord();
+  usedWords.add(w);
+  history.push({word:w, emoji:e, by:"bot"});
+  renderStage(w, e, "bot");
+  renderChain();
+  updateScoreboard();
+  updateConnector(null, w);
+  wordInput.focus();
+}
+
+function renderStage(word, emoji, by, net){
+  stage.classList.remove("pop");
+  void stage.offsetWidth;
+  stage.classList.add("pop");
+  stageTag.textContent = by === "player" ? "きみの ことば" : (by === "bot" ? "あいての ことば" : "さいしょの ことば");
+  stageTag.className = "stage-tag " + (by === "player" ? "player" : "bot");
+  stageEmoji.textContent = emoji;
+  stageEmoji.className = "stage-emoji" + (emoji === "❓" ? " unknown" : "");
+  const last = word.length - 1;
+  stageWord.innerHTML = word.slice(0,last) + '<span class="lastchar">'+word.slice(last)+'</span>';
+  let badge = stage.querySelector(".net-badge");
+  if(net){
+    if(!badge){
+      badge = document.createElement("div");
+      badge.className = "net-badge";
+      badge.textContent = "🌐 じしょで かくにん";
+      stage.appendChild(badge);
+    }
+  } else if(badge){
+    badge.remove();
+  }
+}
+
+function renderChain(){
+  chainEl.innerHTML = "";
+  history.forEach((item, i) => {
+    if(i > 0){
+      const link = document.createElement("span");
+      link.className = "link";
+      link.textContent = "→";
+      chainEl.appendChild(link);
+    }
+    const wrap = document.createElement("div");
+    wrap.className = "chain-item";
+    const card = document.createElement("div");
+    card.className = "chain-card " + (item.by === "player" ? "by-player" : "by-bot");
+    card.innerHTML = '<div class="em">'+item.emoji+'</div><div class="wd">'+item.word+'</div>'
+      + (item.net ? '<div class="net-mini">🌐</div>' : '');
+    wrap.appendChild(card);
+    chainEl.appendChild(wrap);
+  });
+  chainEl.scrollLeft = chainEl.scrollWidth;
+}
+
+function updateScoreboard(){
+  $("playerScore").textContent = playerScore;
+  $("botScore").textContent = botScore;
+}
+
+function updateConnector(fromWord, toWord, state){
+  if(fromWord){
+    nodeFrom.textContent = lastKana(fromWord) === normChar(fromWord[fromWord.length-1]) ? fromWord[fromWord.length-1] : fromWord[fromWord.length-1];
+    nodeFrom.className = "kana-node active";
+  } else {
+    nodeFrom.textContent = "ー";
+    nodeFrom.className = "kana-node";
+  }
+  if(toWord){
+    nodeTo.textContent = toWord[0];
+  }
+  const need = lastKana(toWord);
+  nodeTo.className = "kana-node active";
+  connectorHint.innerHTML = 'つぎは 「<b>' + need + '</b>」から はじまる ことばだよ';
+  nodeTo.textContent = need;
+}
+
+function setMessage(text, ok){
+  messageEl.textContent = text;
+  messageEl.className = "message" + (ok ? " ok" : "");
+}
+
+function endGame(winner, reasonWord, reasonType){
+  gameOver = true;
+  wordInput.disabled = true;
+  submitBtn.disabled = true;
+  micBtn.disabled = true;
+  overlay.style.display = "flex";
+  overScore.textContent = playerScore;
+
+  if(reasonType === "n"){
+    nStamp.classList.add("show");
+    overEmoji.style.display = "none";
+  } else {
+    nStamp.classList.remove("show");
+    overEmoji.style.display = "";
+  }
+
+  if(winner === "player"){
+    overEmoji.textContent = "🎉";
+    if(reasonType === "n"){
+      overTitle.textContent = "やったね！おわり！";
+      overText.textContent = '「' + reasonWord + '」は「ん」で おわり！ あいての まけだよ。';
+    } else {
+      overTitle.textContent = "きみの かち！";
+      overText.textContent = "あいては つぎの ことばが おもいつかなかったよ。すごい！";
+    }
+  } else {
+    overEmoji.textContent = "😢";
+    if(reasonType === "n"){
+      overTitle.textContent = "ざんねん！おわり！";
+      overText.textContent = '「' + reasonWord + '」は「ん」で おわり… またチャレンジしよう！';
+    } else {
+      overTitle.textContent = "あいての かち…";
+      overText.textContent = "つぎの ことばが おもいつかなかったね。またチャレンジしよう！";
+    }
+  }
+}
+
+function finishGame(){
+  overlay.style.display = "none";
+  micBtn.disabled = true;
+  wordInput.disabled = true;
+  submitBtn.disabled = true;
+  $("hintBtn").disabled = true;
+  $("resetBtn").textContent = "↺ もういちど あそぶ";
+  document.querySelectorAll(".kb-key, #kbBack, #kbClear").forEach(b => b.disabled = true);
+  stageTag.textContent = "おわり";
+  stageTag.className = "stage-tag bot";
+  stageEmoji.textContent = "👋";
+  stageWord.textContent = "またね！";
+  connectorHint.textContent = "あそんでくれて ありがとう！";
+  setMessage("");
+}
+
+function botTurn(requiredKana){
+  awaitingBot = true;
+  setMessage("");
+  stageTag.textContent = "あいての ばん";
+  stageTag.className = "stage-tag bot";
+  stageEmoji.textContent = "🤖";
+  stageWord.innerHTML = '<span class="thinking">かんがえちゅう<span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
+
+  setTimeout(() => {
+    const candidates = DICT.filter(([w]) => firstKana(w) === requiredKana && !usedWords.has(w));
+    const safe = candidates.filter(([w]) => !endsWithN(w));
+    const pool = safe.length > 0 ? safe : candidates;
+
+    if(pool.length === 0){
+      endGame("player", null, "stuck");
+      return;
+    }
+    const [w, e] = pool[Math.floor(Math.random() * pool.length)];
+    usedWords.add(w);
+    history.push({word:w, emoji:e, by:"bot"});
+    botScore++;
+    updateScoreboard();
+    renderStage(w, e, "bot");
+    renderChain();
+    updateConnector(w, w);
+
+    if(endsWithN(w)){
+      setTimeout(() => endGame("player", w, "n"), 500);
+      return;
+    }
+    awaitingBot = false;
+    wordInput.disabled = false;
+    submitBtn.disabled = false;
+    wordInput.focus();
+  }, 750);
+}
+
+function setInputLocked(locked){
+  wordInput.disabled = locked;
+  submitBtn.disabled = locked;
+  micBtn.disabled = locked || !SpeechRecognitionAPI;
+  $("hintBtn").disabled = locked;
+  document.querySelectorAll(".kb-key, #kbBack, #kbClear").forEach(b => b.disabled = locked);
+}
+
+async function submitWord(){
+  if(gameOver || awaitingBot) return;
+  const raw = wordInput.value.trim();
+  if(!raw) return;
+
+  if(!/^[ぁ-んー]+$/.test(raw)){
+    setMessage("ひらがなで にゅうりょくしてね");
+    shakeNode(nodeTo);
+    return;
+  }
+
+  const current = history[history.length - 1].word;
+  const required = lastKana(current);
+
+  if(firstKana(raw) !== required){
+    setMessage('「' + required + '」から はじまる ことばを いれてね');
+    shakeNode(nodeTo);
+    return;
+  }
+
+  if(usedWords.has(raw)){
+    setMessage("もう つかった ことばだよ");
+    shakeNode(nodeTo);
+    return;
+  }
+
+  if(isBlockedWord(raw)){
+    setMessage("その ことばは つかえないよ。べつの ことばを かんがえてみよう");
+    shakeNode(nodeTo);
+    return;
+  }
+
+  let emoji = null;
+  let net = false;
+
+  if(DICT_MAP.has(raw)){
+    // ローカル辞書にある単語 → そのまま採用（はやい）
+    emoji = DICT_MAP.get(raw);
+  } else {
+    // ローカルに無い単語 → オンライン国語辞書で「本物の言葉か」を確認
+    setInputLocked(true);
+    setMessage("🌐 じしょで しらべているよ…", null);
+    messageEl.classList.add("checking");
+
+    const data = await fetchJishoData(raw);
+
+    messageEl.classList.remove("checking");
+    setInputLocked(false);
+
+    if(data === null){
+      setMessage("インターネットに つながらないみたい。Wi-Fiを かくにんして、もういちど ためしてね");
+      shakeNode(nodeTo);
+      return;
+    }
+
+    const entry = findMatchingEntry(data, raw);
+    if(!entry){
+      setMessage("その ことばは じしょに ないみたい…");
+      shakeNode(nodeTo);
+      return;
+    }
+
+    if(isBlockedWord(raw)){ // 念のため二重チェック
+      setMessage("その ことばは つかえないよ。べつの ことばを かんがえてみよう");
+      shakeNode(nodeTo);
+      return;
+    }
+
+    emoji = findEmojiForEntry(entry) || "❓";
+    net = true;
+  }
+
+  // valid word
+  usedWords.add(raw);
+  history.push({word:raw, emoji, by:"player", net});
+  playerScore++;
+  updateScoreboard();
+  setMessage("せいかい！", true);
+  hintCard.classList.remove("show");
+  renderStage(raw, emoji, "player", net);
+  renderChain();
+  wordInput.value = "";
+  updateConnector(raw, raw);
+
+  if(endsWithN(raw)){
+    setTimeout(() => endGame("bot", raw, "n"), 500);
+    return;
+  }
+
+  wordInput.disabled = true;
+  submitBtn.disabled = true;
+  setTimeout(() => botTurn(lastKana(raw)), 400);
+}
+
+function shakeNode(node){
+  node.classList.remove("bad");
+  void node.offsetWidth;
+  node.classList.add("bad");
+  setTimeout(() => node.classList.remove("bad"), 400);
+}
+
+const hintCard = $("hintCard"), hintEmoji = $("hintEmoji"), hintText = $("hintText");
+let hintTimer = null;
+
+function showHintCard(emoji, text, isShake){
+  clearTimeout(hintTimer);
+  hintEmoji.textContent = emoji;
+  hintText.textContent = text;
+  hintCard.classList.remove("show");
+  void hintCard.offsetWidth;
+  hintCard.classList.add("show");
+  if(isShake){
+    hintCard.style.animation = "hint-shake .3s";
+    setTimeout(() => { hintCard.style.animation = ""; }, 300);
+  }
+  hintTimer = setTimeout(() => hintCard.classList.remove("show"), 6000);
+}
+
+function showHint(){
+  if(gameOver || awaitingBot) return;
+  const current = history[history.length - 1].word;
+  const required = lastKana(current);
+  const candidates = DICT.filter(([w]) => firstKana(w) === required && !usedWords.has(w));
+  if(candidates.length === 0){
+    showHintCard("🤔", "ヒントは ないみたい…じぶんの ことばで かんがえてみよう", true);
+    return;
+  }
+  const [, e] = candidates[Math.floor(Math.random() * candidates.length)];
+  showHintCard(e, "「" + required + "」から はじまる ことばだよ。この え、なんだかわかるかな？");
+}
+
+$("hintClose").addEventListener("click", () => {
+  clearTimeout(hintTimer);
+  hintCard.classList.remove("show");
+});
+
+/* ---------------- タッチキーボード ---------------- */
+function canType(){ return !gameOver && !awaitingBot; }
+
+document.querySelectorAll(".kb-key[data-c]").forEach(key => {
+  key.addEventListener("click", () => {
+    if(!canType()) return;
+    wordInput.value += key.dataset.c;
+    wordInput.focus();
+  });
+});
+
+$("kbBack").addEventListener("click", () => {
+  if(!canType()) return;
+  wordInput.value = wordInput.value.slice(0, -1);
+  wordInput.focus();
+});
+$("kbClear").addEventListener("click", () => {
+  if(!canType()) return;
+  wordInput.value = "";
+  wordInput.focus();
+});
+
+document.querySelectorAll(".kb-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".kb-tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".kb-panel").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    const map = {main:"kbMain", daku:"kbDaku", small:"kbSmall"};
+    $(map[tab.dataset.tab]).classList.add("active");
+  });
+});
+
+/* ---------------- 音声入力 ---------------- */
+const micBtn = $("micBtn"), voiceStatus = $("voiceStatus");
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let listening = false;
+
+function katakanaToHiragana(str){
+  return str.replace(/[\u30A1-\u30F6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+}
+function cleanToHiragana(str){
+  const hira = katakanaToHiragana(str);
+  const match = hira.match(/[ぁ-んー]+/g);
+  return match ? match.join("") : "";
+}
+
+if(SpeechRecognitionAPI){
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = "ja-JP";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  recognition.onstart = () => {
+    listening = true;
+    micBtn.classList.add("listening");
+    voiceStatus.textContent = "🎤 きいています…はなしてね";
+  };
+  recognition.onend = () => {
+    listening = false;
+    micBtn.classList.remove("listening");
+    if(voiceStatus.textContent.indexOf("きいています") !== -1){
+      voiceStatus.textContent = "";
+    }
+  };
+  recognition.onerror = (ev) => {
+    listening = false;
+    micBtn.classList.remove("listening");
+    voiceStatus.textContent = "うまく きこえなかったよ。もういちど おしてね";
+  };
+  recognition.onresult = (ev) => {
+    const results = ev.results[0];
+    let picked = "";
+    for(let i = 0; i < results.length; i++){
+      const candidate = cleanToHiragana(results[i].transcript);
+      if(candidate){ picked = candidate; break; }
+    }
+    if(picked){
+      wordInput.value = picked;
+      voiceStatus.textContent = '「' + picked + '」ってきこえたよ。ちがったら タッチで なおしてね';
+    } else {
+      voiceStatus.textContent = "ひらがなに へんかんできなかったよ。タッチで にゅうりょくしてね";
+    }
+  };
+
+  micBtn.addEventListener("click", () => {
+    if(!canType()) return;
+    if(listening){
+      recognition.stop();
+      return;
+    }
+    try{
+      recognition.start();
+    }catch(e){ /* already started */ }
+  });
+} else {
+  micBtn.disabled = true;
+  micBtn.title = "このブラウザは おんせいにゅうりょくに たいおうしていません";
+}
+
+/* ---------------- イベント ---------------- */
+submitBtn.addEventListener("click", submitWord);
+wordInput.addEventListener("keydown", (ev) => { if(ev.key === "Enter") submitWord(); });
+$("resetBtn").addEventListener("click", init);
+$("hintBtn").addEventListener("click", showHint);
+$("overRestart").addEventListener("click", init);
+$("overFinish").addEventListener("click", finishGame);
+
+init();
+</script>
+</body>
+</html>

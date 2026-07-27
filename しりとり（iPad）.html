@@ -952,7 +952,7 @@ function initSpeech() {
   }
 
   recognition = new SpeechRecognition();
-  recognition.lang = 'ja-JP';
+  recognition.lang = 'ja-JP'; // 日本語認識を明示
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
@@ -962,33 +962,52 @@ function initSpeech() {
     voiceStatus.textContent = '🎤 お話ししてください...';
   };
 
-  recognition.onresult = async (event) => {
+  recognition.onresult = (event) => {
+    // 1. マイクで聞き取ったテキストを取得
     const transcript = event.results[0][0].transcript.trim();
-    voiceStatus.textContent = `聞き取ったよ: 「${transcript}」...変換中`;
-
-    // 1. まず辞書から「漢字」または「読み」で一致するものを探す
+    
+    // 2. 辞書の中から「漢字表記(word)」または「読み(reading)」が一致するものを探す
     let matched = dictionary.find(d => d.word === transcript || d.reading === transcript);
-    let hira = "";
+    
+    // 3. 辞書にあればその「ひらがな読み」、なければカタカナ等をひらがなに変換
+    let hira = matched ? matched.reading : getNormalizedKana(transcript);
+    
+    // 4. ひらがな以外の文字（記号など）を除外
+    hira = hira.replace(/[^ぁ-んー]/g, '');
 
-    if (matched) {
-      hira = matched.reading;
-    } else {
-      // 2. 辞書にない場合、ひらがな以外の文字（漢字・カタカナ）を強力にひらがなへ変換
-      hira = await convertToHiragana(transcript);
-    }
+    // 5. 入力欄に「ひらがな」をセット
+    wordInput.value = hira || transcript;
+    voiceStatus.textContent = `聞き取れたよ: 「${wordInput.value}」`;
 
-    // 記号などを除外して「ひらがな」のみ抽出
-    hira = getNormalizedKana(hira).replace(/[^ぁ-んー]/g, '');
-
-    wordInput.value = hira;
-    voiceStatus.textContent = `「${hira}」で入力したよ！`;
-
+    // 6. 少し待ってから送信
     setTimeout(() => {
       voiceStatus.textContent = '';
       handlePlayerTurn();
     }, 600);
   };
 
+  recognition.onerror = (event) => {
+    voiceStatus.textContent = 'うまく 聞き取れなかったよ';
+    setTimeout(() => voiceStatus.textContent = '', 2000);
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+  };
+
+  micBtn.addEventListener('click', () => {
+    if (isListening) {
+      recognition.stop();
+    } else {
+      try {
+        recognition.start();
+      } catch(e) {
+        console.log(e);
+      }
+    }
+  });
+}
   // 漢字をひらがなに変換する補助関数（Web標準の変換ロジック）
   async function convertToHiragana(text) {
     // すでにひらがな・カタカナの場合はそのままカタカナをひらがな化

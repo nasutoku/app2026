@@ -1,207 +1,239 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>首振り絵本ビューア</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #111;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #fff;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            /* タップ時のハイライトなどを抑制 */
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        #book-container {
-            position: relative;
-            width: 90vw;
-            height: 65vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #222;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .page-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: none;
-        }
-        .page-img.active {
-            display: block;
-        }
-        #camera-container {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 120px;
-            height: 90px;
-            border: 2px solid #555;
-            border-radius: 8px;
-            overflow: hidden;
-            transform: scaleX(-1); /* 鏡映像にする */
-            z-index: 10;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #status {
-            margin-top: 15px;
-            font-size: 1rem;
-            background: rgba(0,0,0,0.6);
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 90vw;
-        }
-        #page-number {
-            position: absolute;
-            bottom: 15px;
-            font-size: 1rem;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>顔を動かして読める絵本（感度調整版）</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #222;
+    color: #fff;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  /* カメラ映像（非表示または確認用小型表示） */
+  #webcam {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 120px;
+    height: 90px;
+    border-radius: 8px;
+    border: 2px solid #555;
+    transform: scaleX(-1); /* 鏡像表示 */
+    z-index: 10;
+    object-fit: cover;
+  }
+
+  /* 絵本ステージ */
+  .book-container {
+    width: 90vw;
+    max-width: 800px;
+    height: 60vh;
+    background: #fff;
+    color: #333;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .page-content {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .page-number {
+    position: absolute;
+    bottom: 15px;
+    font-size: 18px;
+    color: #888;
+  }
+
+  /* デバッグ・状態表示バー */
+  .status-bar {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #ccc;
+    background: rgba(0,0,0,0.6);
+    padding: 8px 16px;
+    border-radius: 20px;
+  }
+
+  /* 調整インジケーター */
+  .indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #666;
+    margin-right: 8px;
+  }
+  .indicator.active { background: #00ff00; }
+  .indicator.cooldown { background: #ff9900; }
+</style>
+
+<!-- MediaPipe Face Landmarker 読み込み -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/v0.4/face_landmarker/face_landmarker.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <div id="book-container">
-        <img src="01.JPG" class="page-img active">
-        <img src="02.JPG" class="page-img">
-        <img src="03.JPG" class="page-img">
-        <img src="04.JPG" class="page-img">
-        <img src="05.JPG" class="page-img">
-        <img src="06.JPG" class="page-img">
-        <img src="07.JPG" class="page-img">
-        <img src="08.JPG" class="page-img">
-        <img src="09.JPG" class="page-img">
-        <img src="10.JPG" class="page-img">
-        <img src="11.JPG" class="page-img">
-        <img src="12.JPG" class="page-img">
-        <img src="13.JPG" class="page-img">
-        <img src="14.JPG" class="page-img">
-        <img src="15.JPG" class="page-img">
-        <img src="16.JPG" class="page-img">
-        <img src="17.JPG" class="page-img">
-        <img src="18.JPG" class="page-img">
-        <img src="19.JPG" class="page-img">
+<video id="webcam" autoplay playsinline muted></video>
 
-        <div id="page-number">1 / 19</div>
-    </div>
+<div class="book-container">
+  <div class="page-content" id="page-text">📖 1ページ目：むかし むかし あるところに...</div>
+  <div class="page-number" id="page-num">1 / 5</div>
+</div>
 
-    <div id="status">カメラを読み込み中... 顔を正面に向けてください</div>
+<div class="status-bar">
+  <span class="indicator" id="status-ind"></span>
+  <span id="status-text">カメラを読み込み中...</span>
+</div>
 
-    <div id="camera-container">
-        <!-- モバイル（iOS Safari等）対応として playsinline, autoplay, muted を追加 -->
-        <video id="input-video" playsinline autoplay muted></video>
-    </div>
+<script>
+// ==========================================
+// 絵本データ
+// ==========================================
+const pages = [
+  "📖 1ページ目：むかし むかし あるところに...",
+  "おじいさんと おばあさんが いました。",
+  "おじいさんは やまへ しばかりに",
+  "おばあさんは かわへ せんたくに いきました。",
+  "🎉 おしまい（右に顔を向けると戻ります）"
+];
+let currentPage = 0;
 
-    <script>
-        const videoElement = document.getElementById('input-video');
-        const statusElement = document.getElementById('status');
-        const pageNumElement = document.getElementById('page-number');
-        const pages = document.querySelectorAll('.page-img');
-        
-        let currentPage = 0;
-        let isCoolDown = false;
-        const COOL_DOWN_TIME = 1500;
+// ==========================================
+// 感度（閾値）設定パラメータ
+// ==========================================
+// 【感度調整】数値が大きいほど、しっかり顔を向けないと反応しなくなります（誤動作防止）
+const YAW_THRESHOLD_RIGHT = -22; // 右を向いた時の角度閾値（度）
+const YAW_THRESHOLD_LEFT  =  22; // 左を向いた時の角度閾値（度）
 
-        function updatePage(index) {
-            if (index < 0 || index >= pages.length) return;
-            pages[currentPage].classList.remove('active');
-            currentPage = index;
-            pages[currentPage].classList.add('active');
-            pageNumElement.innerText = `${currentPage + 1} / ${pages.length}`;
+// 【連続防止】一度めくった後、次に反応するまでの待機時間（ミリ秒）
+const COOLDOWN_MS = 2000; 
+
+let isCooldown = false;
+let faceLandmarker = null;
+
+const pageTextEl = document.getElementById("page-text");
+const pageNumEl  = document.getElementById("page-num");
+const statusTextEl = document.getElementById("status-text");
+const statusIndEl  = document.getElementById("status-ind");
+const videoEl = document.getElementById("webcam");
+
+function updatePage() {
+  pageTextEl.textContent = pages[currentPage];
+  pageNumEl.textContent = `${currentPage + 1} / ${pages.length}`;
+}
+
+function nextPage() {
+  if (currentPage < pages.length - 1) {
+    currentPage++;
+    updatePage();
+    triggerCooldown("▶️ 次のページへ");
+  }
+}
+
+function prevPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    updatePage();
+    triggerCooldown("◀️ 前のページへ");
+  }
+}
+
+function triggerCooldown(actionName) {
+  isCooldown = true;
+  statusIndEl.className = "indicator cooldown";
+  statusTextEl.textContent = `${actionName} （待機中...）`;
+
+  setTimeout(() => {
+    isCooldown = false;
+    statusIndEl.className = "indicator active";
+    statusTextEl.textContent = "顔の動作を監視中（安定）";
+  }, COOLDOWN_MS);
+}
+
+// ==========================================
+// 顔認識（MediaPipe）初期化 & 判定処理
+// ==========================================
+async function initFaceLandmarker() {
+  const vision = await window.FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/v0.4/wasm"
+  );
+  faceLandmarker = await window.FaceLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      delegate: "GPU"
+    },
+    runningMode: "VIDEO",
+    numFaces: 1
+  });
+
+  startCamera();
+}
+
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then((stream) => {
+    videoEl.srcObject = stream;
+    videoEl.addEventListener("loadeddata", predictWebcam);
+    statusIndEl.className = "indicator active";
+    statusTextEl.textContent = "顔の動作を監視中（安定）";
+  }).catch(err => {
+    statusTextEl.textContent = "カメラの起動に失敗しました";
+  });
+}
+
+let lastVideoTime = -1;
+async function predictWebcam() {
+  if (videoEl.currentTime !== lastVideoTime) {
+    lastVideoTime = videoEl.currentTime;
+    const results = faceLandmarker.detectForVideo(videoEl, performance.now());
+
+    if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+      const landmarks = results.faceLandmarks[0];
+      
+      // 鼻先(1)と両耳付近(234, 454)から簡易的に顔の向き（Yaw角）を計算
+      const nose = landmarks[1];
+      const leftEar = landmarks[234];
+      const rightEar = landmarks[454];
+
+      const earCenterX = (leftEar.x + rightEar.x) / 2;
+      // 顔の左右の向きの偏差
+      const yawOffset = (nose.x - earCenterX) * 100;
+
+      if (!isCooldown) {
+        // カメラは鏡像のため、ユーザーが左を向くと値が大きく、右を向くと小さくなります
+        if (yawOffset < YAW_THRESHOLD_RIGHT) {
+          nextPage(); // 右を向いたら次へ
+        } else if (yawOffset > YAW_THRESHOLD_LEFT) {
+          prevPage(); // 左を向いたら前へ
         }
+      }
+    }
+  }
+  requestAnimationFrame(predictWebcam);
+}
 
-        function onResults(results) {
-            if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
-                statusElement.innerText = "顔が検出されません";
-                return;
-            }
-
-            const landmarks = results.multiFaceLandmarks[0];
-            const nose = landmarks[1];
-            const leftEar = landmarks[234];
-            const rightEar = landmarks[454];
-
-            const faceWidth = Math.abs(rightEar.x - leftEar.x);
-            const noseRelativeX = (nose.x - leftEar.x) / faceWidth;
-
-            if (isCoolDown) {
-                statusElement.innerText = "（待機中...）";
-                return;
-            }
-
-            statusElement.innerText = "正面を向いています。首を振ってページめくり";
-
-            if (noseRelativeX < 0.35) { 
-                if (currentPage < pages.length - 1) {
-                    triggerPageFlip(currentPage + 1, "👉 次のページへ");
-                }
-            } else if (noseRelativeX > 0.65) {
-                if (currentPage > 0) {
-                    triggerPageFlip(currentPage - 1, "👈 前のページへ");
-                }
-            }
-        }
-
-        function triggerPageFlip(nextPage, message) {
-            isCoolDown = true;
-            statusElement.innerText = message;
-            updatePage(nextPage);
-            
-            setTimeout(() => {
-                isCoolDown = false;
-            }, COOL_DOWN_TIME);
-        }
-
-        const faceMesh = new FaceMesh({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-        });
-
-        faceMesh.setOptions({
-            maxNumFaces: 1,
-            refineLandmarks: false,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-
-        faceMesh.onResults(onResults);
-
-        // iPad/スマホのフロントカメラを確実ادに指定するための設定
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await faceMesh.end ? await faceMesh.send({image: videoElement}) : await faceMesh.send({image: videoElement});
-            },
-            facingMode: 'user', // 内側（インカメラ）を指定
-            width: 640,
-            height: 480
-        });
-
-        camera.start().then(() => {
-            statusElement.innerText = "準備完了！顔を左右に振ってみてください。";
-        }).catch(err => {
-            statusElement.innerText = "カメラの起動に失敗しました: " + err;
-            console.error(err);
-        });
-    </script>
+window.onload = initFaceLandmarker;
+</script>
 </body>
 </html>

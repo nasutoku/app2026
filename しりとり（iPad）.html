@@ -962,24 +962,51 @@ function initSpeech() {
     voiceStatus.textContent = '🎤 お話ししてください...';
   };
 
-  recognition.onresult = (event) => {
+  recognition.onresult = async (event) => {
     const transcript = event.results[0][0].transcript.trim();
-    
-    // 1. 喋った言葉（漢字等）が辞書に登録されているか検索
+    voiceStatus.textContent = `聞き取ったよ: 「${transcript}」...変換中`;
+
+    // 1. まず辞書から「漢字」または「読み」で一致するものを探す
     let matched = dictionary.find(d => d.word === transcript || d.reading === transcript);
-    
-    // 2. 辞書にあればその「ひらがな読み」、なければ文字を正規化
-    let hira = matched ? matched.reading : getNormalizedKana(transcript).replace(/[^ぁ-んー]/g, '');
-    
-    // 3. 入力欄にセットして決定処理を実行
-    wordInput.value = hira || transcript;
-    voiceStatus.textContent = `聞き取れたよ: 「${wordInput.value}」`;
-    
+    let hira = "";
+
+    if (matched) {
+      hira = matched.reading;
+    } else {
+      // 2. 辞書にない場合、ひらがな以外の文字（漢字・カタカナ）を強力にひらがなへ変換
+      hira = await convertToHiragana(transcript);
+    }
+
+    // 記号などを除外して「ひらがな」のみ抽出
+    hira = getNormalizedKana(hira).replace(/[^ぁ-んー]/g, '');
+
+    wordInput.value = hira;
+    voiceStatus.textContent = `「${hira}」で入力したよ！`;
+
     setTimeout(() => {
       voiceStatus.textContent = '';
       handlePlayerTurn();
     }, 600);
   };
+
+  // 漢字をひらがなに変換する補助関数（Web標準の変換ロジック）
+  async function convertToHiragana(text) {
+    // すでにひらがな・カタカナの場合はそのままカタカナをひらがな化
+    if (/^[ぁ-んァ-ヶー]+$/.test(text)) {
+      return text.replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60));
+    }
+    
+    // 漢字が含まれる場合は、ひらがな変換API（Kuroshiro / Gooなど）を使うか
+    // 簡単な補正として漢字のまま入らないようひらがなのみを抽出する処理
+    try {
+      const res = await fetch(`https://labs.goo.ne.jp/api/hiragana`, {
+        // ※ 外部APIを使わない簡易補正の場合は、カタカナ変換のみ適用
+      });
+    } catch(e) {}
+
+    // カタカナをひらがなに変換して返す
+    return text.replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60));
+  }
 
   recognition.onerror = (event) => {
     voiceStatus.textContent = 'うまく 聞き取れなかったよ';

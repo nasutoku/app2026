@@ -963,10 +963,18 @@ function initSpeech() {
   };
 
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    const hira = getNormalizedKana(transcript).replace(/[^ぁ-んー]/g, '');
+    const transcript = event.results[0][0].transcript.trim();
+    
+    // 1. 喋った言葉（漢字等）が辞書に登録されているか検索
+    let matched = dictionary.find(d => d.word === transcript || d.reading === transcript);
+    
+    // 2. 辞書にあればその「ひらがな読み」、なければ文字を正規化
+    let hira = matched ? matched.reading : getNormalizedKana(transcript).replace(/[^ぁ-んー]/g, '');
+    
+    // 3. 入力欄にセットして決定処理を実行
     wordInput.value = hira || transcript;
     voiceStatus.textContent = `聞き取れたよ: 「${wordInput.value}」`;
+    
     setTimeout(() => {
       voiceStatus.textContent = '';
       handlePlayerTurn();

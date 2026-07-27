@@ -406,7 +406,7 @@ const DICT_BASE = [
   ["うえ","⬆️"],["うえき","🪴"],["うえきばち","🪴"],["うきわ","🛟"],["うぐいす","🐦"],
   ["うけつけ","💁"],["うさぎ","🐰"],["うし","🐮"],["うしろ","⬅️"],["うた","🎤"],
   ["うち","🏠"],["うちゅう","🚀"],["うちゅうじん","👽"],["うちゅうせん","🛸"],["うちわ","🪭"],
-  ["うどん","🍜"],["うなぎ","🐍"],["うに","🍣"],["うま","🐴"],["うみ","🌊"],
+  ["うどん","🍜"],["うなぎ","🐍"],["うま","🐴"],["うみ","🌊"],
   ["うみべ","🏖️"],["うめ","🌸"],["うめぼし","🔴"],["うら","🔙"],["うり","🥒"],
   ["うわぎ","🧥"],["うわぐつ","👟"],["うんどう","🏃"],["うんどうかい","🏃"],["うんち","💩"],
   ["え","🎨"],["えあこん","❄️"],["えいが","🎬"],["えいがかん","🎦"],["えいご","🔤"],
@@ -504,498 +504,461 @@ const DICT_BASE = [
   ["でざーと","🍰"],["でんきゅう","💡"],["でんしこくばん","📺"],["でんせつ","📜"],["でんぱ","📡"],
   ["とけい","⏰"],["とまと","🍅"],["とら","🐯"],["とり","🐦"],["とんぼ","蜻"],
   ["とうもろこし","🌽"],["とうふ","🧊"],["とりのす","🪹"],["とらんぷ","🃏"],["とらっく","🚚"],
-  ["とんねる","🚇"],["とう","🗼"],["とうげ","⛰️"],["としょかん","📚"],["とおい","🛣️"],
-  ["どうぶつ","🦁"],["どうぶつえん","🦁"],["どうぐ","🧰"],["どーなつ","🍩"],["どくしょ","📖"],
-  ["どうろ","🛣️"],["どうのめだる","🥉"],["どうくつ","🕳️"],["どろ","泥"],["どれす","👗"],
-  ["なべ","🍲"],["なわ","🪢"],["なわとび","🪢"],["なつ","☀️"],["なつやすみ","🌴"],
-  ["なす","🍆"],["なみ","🌊"],["なみだ","💧"],["なぞなぞ","❓"],["なまけもの","🦥"],
-  ["なまり","✏️"],["なら","🦌"],["なると","🍥"],["なんきんじょう","🔒"],["なっとう","🫘"],
-  ["にじ","🌈"],["にく","🥩"],["にんじん","🥕"],["にんにく","🧄"],["にんぎょう","🧸"],
-  ["にんじゃ","𥥷"],["にわとり","🐔"],["にわ","🏡"],["にほん","🗾"],["にもの","🍲"],
-  ["にし","西"],["にっき","📓"],["にそうせん","🚢"],["にほんし","📜"],["にがおえ","🎨"],
-  ["ぬりえ","🎨"],["ぬま","🐊"],["ぬの","🧵"],["ぬか","🌾"],["ぬけみち","🚪"],
-  ["ぬりぐすり","🧴"],["ぬいぐるみ","🧸"],["ぬりもの","漆"],["ぬくもり","♨️"],["ぬのじ","🧵"],
-  ["ねこ","🐱"],["ねずみ","🐭"],["ねんど","🧱"],["ねくたい","👔"],["ねったいぎょ","🐠"],
-  ["ねぶくろ","⛺"],["ねぎ","🧅"],["ねむり","😴"],["ねつ","🌡️"],["ねんね","👶"],
-  ["のり","🍙"],["のりもの","🚗"],["のーと","📓"],["のぞみ","🚅"],["のこぎり","🪚"],
-  ["のらねこ","🐱"],["のうぎょう","🌾"],["のうか","👨‍🌾"],["のうぐ","👨‍🌾"],["のど","🗣️"],
-  ["は","🦷"],["はな","🌸"],["はなび","🎆"],["はち","🐝"],["はちみつ","🍯"],
-  ["はさみ","✂️"],["はと","🕊️"],["はむすたー","🐹"],["はくさい","🥬"],["はくちょう","🦢"],
-  ["はこ","📦"],["はし","橋"],["はしご","🪜"],["はっぱ","🍃"],["はんこ","💮"],
-  ["はんかち","🧣"],["ばなな","🍌"],["ばいく","🏍️"],["ばす","🚌"],["ばれーぼーる","🏐"],
-  ["ばけつ","🪣"],["ばら","🌹"],["ぱん","🍞"],["ぱんだ","🐼"],["ぱいなっぷる","🍍"],
-  ["ぱり","🗼"],["ぱとかー","🚓"],["ひこうき","✈️"],["ひまわり","🌻"],["ひつじ","🐑"],
-  ["ひよこ","🐥"],["ひこうせん","🎈"],["ひのたま","🔥"],["ひかり","✨"],["ひがし","東"],
-  ["ひるごはん","🍱"],["ひみつ","🤫"],["ひも","🧵"],["ひる","☀️"],["ひこうじょう","✈️"],
-  ["びいだま","🔮"],["びょういん","🏥"],["びーる","🍺"],["びじゅつかん","🖼️"],["びデオ","📹"],
-  ["ぴなの","🎹"],["ぴざ","🍕"],["ぴえろ","🤡"],["ぴんせっと","🥢"],["ぴんぽん","🏓"],
-  ["ふね","🚢"],["ふうせん","🎈"],["ふくろう","🦉"],["ふみきり","🚧"],["ふで","🖌️"],
-  ["ふでばこ","✏️"],["ふとん","🛌"],["ふらいぱん","🍳"],["ふらんす","🇫🇷"],["ふりかけ","🍚"],
-  ["ふく","👕"],["ふた","🫙"],["ふうとう","✉️"],["ぶどう","🍇"],["ぶた","🐷"],
-  ["ぶらんこ","🛝"],["ぶろっこりー","🥦"],["ぶんぼうぐ","✏️"],["ぷーる","🏊"],["ぷりん","🍮"],
-  ["ぷれぜんと","🎁"],["ぷらぐ","🔌"],["ぷらすちっく","♻️"],["へび","🐍"],["へりこぷたー","🚁"],
-  ["へや","🚪"],["へんじ","✉️"],["へんしん","🦸"],["べんとう","🍱"],["べっと","🛏️"],
-  ["べると","🥋"],["べんきょう","📚"],["べんち","🪑"],["ぺんぎん","🐧"],["ぺん","🖊️"],
-  ["ぺっと","🐶"],["ぺっとぼとる","🍾"],["ぺーじ","📄"],["ほし","⭐"],["ほん","📚"],
-  ["ほんだな","📚"],["ほうき","🧹"],["ほうれんそう","🥬"],["ほね","🦴"],["ほいくえん","🏫"],
-  ["ほのお","🔥"],["ほしぞら","🌃"],["ぼーる","⚽"],["ぼうし","🧢"],["ぼたん","🔘"],
-  ["ぼーと","🚣"],["ぼくじょう","🐄"],["ぽすと","📮"],["ぽっぷこーん","🍿"],["ぽけっと","ポケット"],
-  ["まくら","🛌"],["まど","🪟"],["まつり","🏮"],["まつぼっくり","🌲"],["まほう","🪄"],
-  ["まほうつかい","🧙"],["まるた","🪵"],["まんが","📖"],["まんじゅう","🍡"],["まめ","🫘"],
-  ["みかん","🍊"],["みず","💧"],["みずうみ","🌊"],["みどり","🟢"],["みなみ","南"],
-  ["みみ","👂"],["みみず","🪱"],["みそしる","🥣"],["みなと","⚓"],["みち","🛣️"],
-  ["むし","🐛"],["むしば","🦷"],["むしめがね","🔍"],["むぎ","🌾"],["むぎちゃ","🍵"],
-  ["むら","🏡"],["むね","🫀"],["むかし","📜"],["むすめ","👧"],["むすこ","👦"],
-  ["め","👁️"],["めがね","👓"],["めだか","🐟"],["めろん","🍈"],["めん","🍜"],
-  ["めざましどけい","⏰"],["めいし","📇"],["めーる","📧"],["めだる","🏅"],["めーたー","📟"],
-  ["もも","🍑"],["もり","🌲"],["もち","🍡"],["もくざい","🪵"],["もぐら","🕳️"],
-  ["もみじ","🍁"],["もくせい","🪐"],["もくようび","📅"],["ものさし","📏"],["もでる","🧍"],
-  ["やぎ","🐐"],["やま","⛰️"],["やさい","🥗"],["やきいも","🍠"],["やきにく","🥩"],
-  ["やきそば","🍝"],["やきとり","🍢"],["やくそく","🤝"],["やかん","🫖"],["やね","🏠"],
-  ["やじるし","➡️"],["やし","🌴"],["やきゅう","⚾"],["やたい","🏮"],["ゆき","❄️"],
-  ["ゆきだるま","⛄"],["ゆび","👆"],["ゆびわ","💍"],["ゆり","🌸"],["ゆーふぉー","🛸"],
-  ["ゆうやけ","🌅"],["ゆうびんきょく","📮"],["ゆうえんち","🎡"],["ゆか","🪵"],["よる","🌃"],
-  ["ようちえん","🏫"],["ようかい","👻"],["よっと","⛵"],["よん","4️⃣"],["よあけ","🌅"],
-  ["らいおん","🦁"],["らくだ","🐪"],["らっぱ","🎺"],["らーめん","🍜"],["らじお","📻"],
-  ["らけっと","🏸"],["らんぷ","💡"],["らいと","💡"],["らいす","🍚"],["らんち","🍱"],
-  ["りす","🐿️"],["りんご","🍎"],["りぼん","🎀"],["りゅう","🐉"],["りゅっく","🎒"],
-  ["りょうり","🍳"],["りかい","💡"],["りか","🧪"],["りきし","🤼"],["りんぐ","💍"],
-  ["るびー","💎"],["るーれっと","🎰"],["るーと","🗺️"],["るーむ","🚪"],["るーる","📜"],
-  ["れもん","🍋"],["れんこん","🥗"],["れいぞうこ","🧊"],["れすとらん","🍽️"],["れんが","🧱"],
-  ["れーる","🛤️"],["れきし","📜"],["れんしゅう","📝"],["れもんすかし","🍹"],["れんず","🔍"],
-  ["ろば","🫏"],["ろけっと","🚀"],["ろぼっと","🤖"],["ろーそく","🕯️"],["ろーらーすけーと","🛼"],
-  ["ろかー","🗄️"],["ろくが","📹"],["ろじ","🛣️"],["ろーぷ","🪢"],["ろんどん","🇬🇧"],
-  ["わに","🐊"],["わし","🦅"],["わたがし","☁️"],["わな","🪤"],["わら","🌾"],
-  ["わらび","🌿"],["わさび","🍣"],["わなげ","🎯"],["わた","☁️"],["わごむ","⭕"]
+  ["とんねる","🚇"],["とう","🗼"],["とうげ","⛰️"],["としょかん","📚"],["とおい","🔭"],
+  ["どーなつ","🍩"],["どんぐり","🌰"],["どろぼう","🥷"],["どらむ","🥁"],["どあ","🚪"],
+  ["どくしょ","📚"],["どろ","泥"],["どらごん","🐉"],["どうぶつ","🦁"],["どうぶつえん","🦁"],
+  ["ないふ","🔪"],["なわとび","🪢"],["なつ","☀️"],["なつやすみ","🌴"],["なす","🍆"],
+  ["なべ","🍲"],["なみ","🌊"],["なみだ","💧"],["なぞなぞ","❓"],["なのはな","🌼"],
+  ["なまけもの","🦥"],["なまこ","🥒"],["なら","🦌"],["なわ","🪢"],["なんきんじょう","🔒"],
+  ["にじ","🌈"],["にわとり","🐔"],["にんじん","🥕"],["にんにく","🧄"],["にんぎょう","🧸"],
+  ["にんじゃ","🥷"],["にほん","🗾"],["にく","🥩"],["にわ","🏡"],["にし","西"],
+  ["にじいろ","🌈"],["にっき","📓"],["にもの","🍲"],["にものなべ","🍲"],["にがうり","🥒"],
+  ["ぬぐるみ","🧸"],["ぬりえ","🎨"],["ぬま","🐊"],["ぬの","🧵"],["ぬかづけ","🥒"],
+  ["ねこ","🐱"],["ねずみ","🐭"],["ねぎ","🧅"],["ねんど","🎨"],["ねっくれす","📿"],
+  ["ねったいぎょ","🐠"],["ねぶくろ","⛺"],["ねぐせ","💇"],["ねんがじょう","📮"],["ねつ","🌡️"],
+  ["のり","🍙"],["のりまき","🍣"],["のりもの","🚗"],["のこぎり","🪚"],["notebook","📓"],
+  ["のーと","📓"],["のぞみ","🚅"],["のらねこ","🐈"],["のど","🗣️"],["のうか","🧑‍🌾"],
+  ["は","歯"],["はな","🌸"],["はなび","🎆"],["はち","🐝"],["はちみつ","🍯"],
+  ["はさみ","✂️"],["はんばーぐ","🍔"],["はんばーがー","🍔"],["はいしゃ","🦷"],["はと","🕊️"],
+  ["はこ","📦"],["はし","橋"],["はしご","🪜"],["はけ","🖌️"],["はっぱ","🍃"],
+  ["はね","🪶"],["はむすたー","🐹"],["はもの","🔪"],["はみがき","🪥"],["はんこ","ハンコ"],
+  ["ばなな","🍌"],["ばら","🌹"],["ばいおりん","🎻"],["ばす","🚌"],["ばけつ","🪣"],
+  ["ばれる","🩰"],["ばれてー","🩰"],["ばいく","🏍️"],["ばっと","🏏"],["ばるーん","🎈"],
+  ["ぱん","🍞"],["ぱんだ","🐼"],["ぱいなっぷる","🍍"],["ぱふぇ","🍨"],["ぱんだこーひー","☕"],["ぱそこん","💻"],
+  ["ひこうき","✈️"],["ひまわり","🌻"],["ひつじ","🐑"],["ひよこ","🐥"],["ひかり","✨"],
+  ["ひろば","🏞️"],["ひきだし","🗄️"],["ひらがな","🔤"],["ひる","☀️"],["ひるごはん","🍱"],
+  ["ひなまつり","🎎"],["ひがし","東"],["ひのき","🌲"],["ひょう","🐆"],["ひょうたん","🫛"],
+  ["びいだま","🔮"],["びょういん","🏥"],["びじゅつかん","🖼️"],["びでお","📹"],["びーる","🍺"],
+  ["ぴあの","🎹"],["ぴえろ","🤡"],["ぴんく","🩷"],["ぴざ","🍕"],["ぴんぽん","🏓"],
+  ["ふね","🚢"],["ふうせん","🎈"],["ふくろう","🦉"],["ふく","👕"],["ふで","🖌️"],
+  ["ふでばこ","✏️"],["ふとん","🛌"],["ふみきり","🚧"],["ふうりん","🎐"],["ふらいぱん","🍳"],
+  ["ぶどう","🍇"],["ぶた","🐷"],["ブランコ","🛝"],["ぶらんこ","🛝"],["ぶろっこりー","🥦"],["ぶんぼうぐ","✏️"],
+  ["ぷーる","🏊"],["ぷりんでんしょく","🍮"],["ぷりん","🍮"],["ぷれぜんと","🎁"],["ぷろぐらみんぐ","💻"],
+  ["へび","🐍"],["へりこぷたー","🚁"],["へや","🚪"],["へんじ","✉️"],["へんしん","✨"],
+  ["べんとう","🍱"],["べんきょう","📚"],["べっど","🛏️"],["べると","👖"],["べんち","🪑"],
+  ["ぺんぎん","🐧"],["ぺん","🖊️"],["ぺっとぼとる","🍾"],["ぺーじ","📖"],["ぺいんと","🎨"],
+  ["ほし","⭐"],["ほん","📚"],["ほんや","📚"],["ほね","🦴"],["ほうき","🧹"],
+  ["ほうれんそう","🥬"],["ほっとけーき","🥞"],["ほいくえん","🏫"],["ほのお","🔥"],["ほてり","♨️"],
+  ["ぼーる","⚽"],["ぼうし","🧢"],["ぼたん","🔘"],["ぼーと","🚣"],["ぼくじょう","🐮"],
+  ["ぽすと","📮"],["ぽっぷこーん","🍿"],["ぽけっと","👕"],["ぽんかん","🍊"],["ぽんぷ","🚰"],
+  ["まくら","🛌"],["まつり","🏮"],["まとうりょーしか","🪆"],["まめ","🫛"],["みかん","🍊"],
+  ["みず","💧"],["みみ","👂"],["虫","🐛"],["むし","🐛"],["めがね","👓"],
+  ["めだか","🐟"],["めろん","🍈"],["もち","🍡"],["もも","🍑"],["もり","🌲"],
+  ["やかん","🫖"],["やま","⛰️"],["やぎ","🐐"],["野菜","🥦"],["やさい","🥦"],
+  ["ゆき","❄️"],["ゆきだるま","⛄"],["ゆび","👆"],["ゆめ","☁️"],["よる","🌙"],
+  ["らいおん","🦁"],["らっぱ","🎺"],["らーめん","🍜"],["りす","🐿️"],["りんご","🍎"],["りぼん","🎀"],
+  ["りゅう","🐉"],["りゅっく","🎒"],["るびー","💎"],["れもん","🍋"],["れんこん","🪷"],
+  ["ろぼっと","🤖"],["ろけっと","🚀"],["ろうそく","🕯️"],["わに","🐊"],["わなげ","⭕"]
 ];
 
-function getNormalizedKana(str) {
-  let s = str.trim();
-  s = s.replace(/[\u30A1-\u30F6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
-  return s;
-}
-
-function getTailKana(kana) {
-  if (!kana) return '';
-  let last = kana.slice(-1);
-  if (last === 'ー') {
-    if (kana.length >= 2) {
-      last = kana.slice(-2, -1);
+function convertFullToHiragana(str) {
+  if (!str) return "";
+  let res = "";
+  for (let i = 0; i < str.length; i++) {
+    let code = str.charCodeAt(i);
+    // カタカナ (ァ〜ヶ: 0x30A1〜0x30F6) -> ひらがな (ぁ〜ヶ: 0x3041〜0x3096)
+    if (code >= 0x30A1 && code <= 0x30F6) {
+      res += String.fromCharCode(code - 0x0060);
+    }
+    // 濁点・半濁点の結合文字など
+    else if (code >= 0x30F7 && code <= 0x30FA) {
+      res += String.fromCharCode(code - 0x0060);
+    } else {
+      res += str[i];
     }
   }
-  const smallMap = {
-    'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お',
-    'ゃ':'や','ゅ':'ゆ','ょ':'よ','っ':'つ','ゎ':'わ'
-  };
-  if (smallMap[last]) last = smallMap[last];
-  return last;
+  return res;
 }
 
-function getHeadKana(kana) {
-  if (!kana) return '';
-  let first = kana.charAt(0);
-  const smallMap = {
-    'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お',
-    'ゃ':'や','ゅ':'ゆ','ょ':'よ','っ':'つ','ゎ':'わ'
-  };
-  if (smallMap[first]) first = smallMap[first];
-  return first;
+// 漢字やカタカナなどの音声変換・一般語を ひらがなに直す超軽量マッピング
+const KANJI_MAP = {
+  "猫":"ねこ","犬":"いぬ","空":"そら","海":"うみ","山":"やま","川":"かわ","花":"はな","木":"き",
+  "雨":"あめ","雪":"ゆき","星":"ほし","月":"つき","日":"ひ","車":"くるま","船":"ふね","鳥":"とり",
+  "魚":"さかな","虫":"むし","本":"ほん","手":"て","足":"あし","目":"め","耳":"みみ","口":"くち",
+  "家":"いえ","石":"いし","紙":"かみ","箱":"はこ","風":"かぜ","光":"ひかり","赤":"あか","青":"あお",
+  "黄":"きいろ","白":"しろ","黒":"くろ","緑":"みどり","桃":"もも","栗":"くり","柿":"かき",
+  "猿":"さる","鹿":"しか","熊":"くま","象":"ぞう","虎":"とら","牛":"うし","馬":"うま","豚":"ぶた",
+  "羊":"ひつじ","狐":"きつね","狸":"たぬき","蛙":"かえる","亀":"かめ","蛸":"たこ","烏賊":"いか",
+  "蟹":"かに","蝦":"えび","貝":"かい","蝉":"せみ","蝶":"ちょう","蜂":"はち","蟻":"あり",
+  "駅":"えき","町":"まち","道":"みち","橋":"はし","池":"いけ","森":"もり","林":"はやし",
+  "昼":"ひる","夜":"よる","朝":"あさ","夕方":"ゆうがた","夏":"なつ","秋":"あき","冬":"ふゆ","春":"はる"
+};
+
+function normalizeText(input) {
+  if(!input) return "";
+  let text = input.trim();
+  // 1. 漢字辞書にあるものは一括変換
+  for(let k in KANJI_MAP){
+    text = text.replace(new RegExp(k, 'g'), KANJI_MAP[k]);
+  }
+  // 2. カタカナ -> ひらがな
+  text = convertFullToHiragana(text);
+  // 3. 辞書データベースの単語と一致するもの（漢字など）があれば完全ひらがなに置き換え
+  for(let [word, emoji] of DICT_BASE){
+    if(text === word) return word;
+  }
+  // 4. アルファベットや余計な記号を排除し、ひらがな・ー・伸ばし棒のみ残す
+  text = text.replace(/[^ぁ-んー]/g, '');
+  return text;
 }
 
-let dictionary = [];
-let usedWords = new Set();
-let chainHistory = [];
-let currentHead = '';
+const DICT = DICT_BASE.map(([word, emoji]) => ({ word, emoji }));
+
+let history = [];
+let currentWord = "";
 let playerScore = 0;
 let botScore = 0;
 let isBotTurn = false;
 let recognition = null;
 let isListening = false;
 
-function initDict() {
-  dictionary = DICT_BASE.map(([w, em]) => {
-    const reading = getNormalizedKana(w);
-    return {
-      word: w,
-      reading: reading,
-      head: getHeadKana(reading),
-      tail: getTailKana(reading),
-      emoji: em
-    };
-  });
+const $ = id => document.getElementById(id);
+
+function getDisplayLastChar(word){
+  if (!word) return "";
+  let last = word.slice(-1);
+  if (last === 'ー' && word.length > 1) {
+    last = word.slice(-2, -1);
+  }
+  const smallToBig = {
+    'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お',
+    'ゃ':'あ','ゅ':'う','ょ':'お','っ':'つ','ゎ':'わ'
+  };
+  return smallToBig[last] || last;
 }
 
-const nodeFromEl = document.getElementById('nodeFrom');
-const nodeToEl = document.getElementById('nodeTo');
-const stageWordEl = document.getElementById('stageWord');
-const stageEmojiEl = document.getElementById('stageEmoji');
-const stageTagEl = document.getElementById('stageTag');
-const chainEl = document.getElementById('chain');
-const wordInput = document.getElementById('wordInput');
-const submitBtn = document.getElementById('submitBtn');
-const micBtn = document.getElementById('micBtn');
-const voiceStatus = document.getElementById('voiceStatus');
-const messageEl = document.getElementById('message');
-const hintCard = document.getElementById('hintCard');
-const hintEmoji = document.getElementById('hintEmoji');
-const hintText = document.getElementById('hintText');
-const hintBtn = document.getElementById('hintBtn');
-const hintClose = document.getElementById('hintClose');
-const resetBtn = document.getElementById('resetBtn');
-const playerScoreEl = document.getElementById('playerScore');
-const botScoreEl = document.getElementById('botScore');
-const overlay = document.getElementById('overlay');
-const overTitle = document.getElementById('overTitle');
-const overText = document.getElementById('overText');
-const overScore = document.getElementById('overScore');
-const overEmoji = document.getElementById('overEmoji');
-const overRestart = document.getElementById('overRestart');
-const overFinish = document.getElementById('overFinish');
-const nStamp = document.getElementById('nStamp');
+function getFirstChar(word){
+  if (!word) return "";
+  const smallToBig = {
+    'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お',
+    'ゃ':'あ','ゅ':'う','ょ':'お','っ':'つ','ゎ':'わ'
+  };
+  return smallToBig[word[0]] || word[0];
+}
 
-function startGame() {
-  initDict();
-  usedWords.clear();
-  chainHistory = [];
-  chainEl.innerHTML = '';
+function findEmoji(word){
+  const match = DICT.find(d => d.word === word);
+  if(match) return match.emoji;
+  return "✨";
+}
 
+function initGame(){
+  history = [];
   playerScore = 0;
   botScore = 0;
-  playerScoreEl.textContent = '0';
-  botScoreEl.textContent = '0';
-  overlay.style.display = 'none';
-  hideHint();
-  setMessage('');
-
-  const candidates = dictionary.filter(item => item.tail !== 'ん');
-  const startObj = candidates[Math.floor(Math.random() * candidates.length)];
-
-  pushChain(startObj, 'bot');
-  setStage(startObj, 'bot');
-  currentHead = startObj.tail;
-  updateNodes(startObj.tail, '?');
-
   isBotTurn = false;
-  wordInput.value = '';
-  wordInput.disabled = false;
-  submitBtn.disabled = false;
-  micBtn.disabled = false;
-  wordInput.focus();
+  $('playerScore').textContent = "0";
+  $('botScore').textContent = "0";
+  $('chain').innerHTML = "";
+  $('message').textContent = "";
+  $('wordInput').value = "";
+  $('hintCard').classList.remove('show');
+
+  const starters = DICT.filter(d => !d.word.endsWith("ん") && d.word.length >= 2);
+  const startObj = starters[Math.floor(Math.random() * starters.length)];
+  currentWord = startObj.word;
+  
+  pushHistory(currentWord, startObj.emoji, "bot");
+  updateStage(currentWord, startObj.emoji, "あいての さいしょの ことば", false);
 }
 
-function updateNodes(from, to) {
-  nodeFromEl.textContent = from || 'ー';
-  nodeToEl.textContent = to || '？';
-  nodeFromEl.classList.remove('active', 'bad');
-  nodeToEl.classList.remove('active', 'bad');
+function updateStage(word, emoji, tagText, isPlayer){
+  const stage = $('stage');
+  const stageTag = $('stageTag');
+  const stageEmoji = $('stageEmoji');
+  const stageWord = $('stageWord');
 
-  if (from) nodeFromEl.classList.add('active');
-}
+  stageTag.textContent = tagText;
+  stageTag.className = "stage-tag " + (isPlayer ? "player" : "bot");
 
-function setStage(obj, byWho) {
-  stageEmojiEl.textContent = obj.emoji || '❓';
-
-  const w = obj.word;
-  if (w.length > 0) {
-    const mainPart = w.slice(0, -1);
-    const lastPart = w.slice(-1);
-    stageWordEl.innerHTML = `${escapeHtml(mainPart)}<span class="lastchar">${escapeHtml(lastPart)}</span>`;
+  stageEmoji.textContent = emoji;
+  
+  const lastC = getDisplayLastChar(word);
+  const base = word.slice(0, -1);
+  const end = word.slice(-1);
+  
+  if(end === 'ー' && word.length > 1){
+    const base2 = word.slice(0, -2);
+    const prev = word.slice(-2, -1);
+    stageWord.innerHTML = `${base2}<span class="lastchar">${prev}</span>ー`;
   } else {
-    stageWordEl.textContent = w;
+    stageWord.innerHTML = `${base}<span class="lastchar">${end}</span>`;
   }
 
-  if (byWho === 'player') {
-    stageTagEl.textContent = 'きみの ことば';
-    stageTagEl.className = 'stage-tag player';
-  } else {
-    stageTagEl.textContent = 'あいての ことば';
-    stageTagEl.className = 'stage-tag bot';
-  }
-
-  const stage = document.getElementById('stage');
   stage.classList.remove('pop');
   void stage.offsetWidth;
   stage.classList.add('pop');
+
+  const required = getDisplayLastChar(word);
+  $('nodeFrom').textContent = required;
+  $('nodeTo').textContent = "？";
+  $('nodeFrom').className = "kana-node active";
+  $('nodeTo').className = "kana-node";
 }
 
-function pushChain(obj, byWho) {
-  usedWords.add(obj.word);
-  chainHistory.push({ ...obj, byWho });
-
-  const card = document.createElement('div');
-  card.className = 'chain-item';
-  card.innerHTML = `
-    <div class="chain-card ${byWho === 'player' ? 'by-player' : 'by-bot'}">
-      <div class="em">${obj.emoji || '💬'}</div>
-      <div class="wd">${escapeHtml(obj.word)}</div>
+function pushHistory(word, emoji, who){
+  history.push({ word, emoji, who });
+  const item = document.createElement('div');
+  item.className = 'chain-item';
+  item.innerHTML = `
+    <div class="chain-card by-${who}">
+      <div class="em">${emoji}</div>
+      <div class="wd">${word}</div>
     </div>
     <div class="link">➔</div>
   `;
-  chainEl.appendChild(card);
-  chainEl.scrollLeft = chainEl.scrollWidth;
+  $('chain').appendChild(item);
+  $('chain').scrollLeft = $('chain').scrollWidth;
 }
 
-function handlePlayerTurn() {
-  if (isBotTurn) return;
-  hideHint();
+function handlePlayerSubmit(){
+  if(isBotTurn) return;
+  
+  const rawInput = $('wordInput').value;
+  const cleaned = normalizeText(rawInput);
+  const targetChar = getDisplayLastChar(currentWord);
 
-  const raw = wordInput.value.trim();
-  if (!raw) {
-    setMessage('ことばを にゅうりょく してね！');
+  if(!cleaned){
+    showError("ひらがなで ことばを 入力してね！");
     return;
   }
 
-  const normalized = getNormalizedKana(raw);
-  const head = getHeadKana(normalized);
-  const tail = getTailKana(normalized);
-
-  if (head !== currentHead) {
-    nodeFromEl.classList.add('bad');
-    setMessage(`「${currentHead}」から はじまる ことばにしてね！`);
+  if(getFirstChar(cleaned) !== targetChar){
+    showError(`「${targetChar}」からはじまる ことばにしてね！`);
     return;
   }
 
-  if (usedWords.has(raw)) {
-    setMessage(`「${raw}」は もう つかわれているよ！`);
+  if(history.some(h => h.word === cleaned)){
+    showError("そのことばは もう つかったよ！");
     return;
   }
 
-  let matched = dictionary.find(d => d.word === raw || d.reading === normalized);
-  if (!matched) {
-    matched = {
-      word: raw,
-      reading: normalized,
-      head: head,
-      tail: tail,
-      emoji: '✨'
-    };
+  if(cleaned.endsWith("ん")){
+    const emoji = findEmoji(cleaned);
+    pushHistory(cleaned, emoji, "player");
+    playerScore++;
+    $('playerScore').textContent = playerScore;
+    gameOver(false, "「ん」が ついちゃった！ きみの まけ！");
+    return;
   }
 
-  pushChain(matched, 'player');
-  setStage(matched, 'player');
+  const emoji = findEmoji(cleaned);
+  pushHistory(cleaned, emoji, "player");
   playerScore++;
-  playerScoreEl.textContent = playerScore;
-  wordInput.value = '';
+  $('playerScore').textContent = playerScore;
+  currentWord = cleaned;
+  $('wordInput').value = "";
+  $('message').textContent = "";
+  $('hintCard').classList.remove('show');
 
-  if (tail === 'ん') {
-    gameOver('player_lose_n');
-    return;
-  }
-
-  currentHead = tail;
-  updateNodes(tail, '?');
-  setMessage('いいね！', true);
+  updateStage(cleaned, emoji, "きみの ことば！", true);
 
   isBotTurn = true;
-  wordInput.disabled = true;
-  submitBtn.disabled = true;
-  micBtn.disabled = true;
-
+  disableControls(true);
   setTimeout(botTurn, 1000 + Math.random() * 800);
 }
 
-function botTurn() {
-  const candidates = dictionary.filter(item => {
-    return item.head === currentHead && !usedWords.has(item.word);
+function botTurn(){
+  const targetChar = getDisplayLastChar(currentWord);
+  
+  const candidates = DICT.filter(d => {
+    if(getFirstChar(d.word) !== targetChar) return false;
+    if(history.some(h => h.word === d.word)) return false;
+    return true;
   });
 
-  if (candidates.length === 0) {
-    gameOver('bot_no_words');
+  if(candidates.length === 0){
+    gameOver(true, "あいては つぎの ことばが おもいつかなかったよ！");
     return;
   }
 
-  const safeCandidates = candidates.filter(item => item.tail !== 'ん');
+  const safeCandidates = candidates.filter(d => !d.word.endsWith("ん"));
   let chosen;
-
-  if (safeCandidates.length > 0) {
+  if(safeCandidates.length > 0 && Math.random() > 0.1){
     chosen = safeCandidates[Math.floor(Math.random() * safeCandidates.length)];
   } else {
     chosen = candidates[Math.floor(Math.random() * candidates.length)];
   }
 
-  pushChain(chosen, 'bot');
-  setStage(chosen, 'bot');
+  pushHistory(chosen.word, chosen.emoji, "bot");
   botScore++;
-  botScoreEl.textContent = botScore;
+  $('botScore').textContent = botScore;
+  currentWord = chosen.word;
 
-  if (chosen.tail === 'ん') {
-    gameOver('bot_lose_n');
+  if(chosen.word.endsWith("ん")){
+    updateStage(chosen.word, chosen.emoji, "あいての ことば", false);
+    gameOver(true, "あいてが「ん」を つけたよ！ きみの かち！");
     return;
   }
 
-  currentHead = chosen.tail;
-  updateNodes(chosen.tail, '?');
-
+  updateStage(chosen.word, chosen.emoji, "あいての ことば！ つぎは きみだよ", false);
   isBotTurn = false;
-  wordInput.disabled = false;
-  submitBtn.disabled = false;
-  micBtn.disabled = false;
-  wordInput.focus();
+  disableControls(false);
 }
 
-function gameOver(reason) {
-  isBotTurn = true;
-  wordInput.disabled = true;
-  submitBtn.disabled = true;
-  micBtn.disabled = true;
+function showError(msg){
+  const m = $('message');
+  m.textContent = msg;
+  m.className = "message";
+  $('nodeFrom').classList.add('bad');
+  setTimeout(() => $('nodeFrom').classList.remove('bad'), 500);
+}
 
-  nStamp.classList.remove('show');
+function disableControls(disabled){
+  $('submitBtn').disabled = disabled;
+  $('wordInput').disabled = disabled;
+  $('micBtn').disabled = disabled;
+  $('hintBtn').disabled = disabled;
+  document.querySelectorAll('.kb-key, .kb-action').forEach(b => b.disabled = disabled);
+}
 
-  if (reason === 'player_lose_n') {
-    overEmoji.textContent = '😭';
+function gameOver(playerWon, reason){
+  disableControls(true);
+  const overlay = $('overlay');
+  const overTitle = $('overTitle');
+  const overText = $('overText');
+  const overScore = $('overScore');
+  const overEmoji = $('overEmoji');
+  const nStamp = $('nStamp');
+
+  overScore.textContent = playerScore;
+
+  if(playerWon){
+    overTitle.textContent = "🎉 きみの かち！";
+    overEmoji.textContent = "🏆";
+    nStamp.classList.remove('show');
+  } else {
+    overTitle.textContent = "😅 おしかったね！";
+    overEmoji.textContent = "💥";
     nStamp.classList.add('show');
-    overTitle.textContent = '「ん」が ついたよ！';
-    overText.textContent = 'ざんねん！最後に「ん」がついちゃった。';
-  } else if (reason === 'bot_no_words') {
-    overEmoji.textContent = '👑';
-    overTitle.textContent = 'きみの かち！';
-    overText.textContent = 'すごい！あいては 次のことばが 思いつかなかったよ。';
-  } else if (reason === 'bot_lose_n') {
-    overEmoji.textContent = '🎉';
-    overTitle.textContent = 'きみの かち！';
-    overText.textContent = 'あいてが 最後に「ん」を つけちゃったよ！';
   }
-
-  overScore.textContent = chainHistory.length;
-  overlay.style.display = 'flex';
+  overText.textContent = reason;
+  overlay.style.display = "flex";
 }
 
-function showHint() {
-  const candidates = dictionary.filter(item => {
-    return item.head === currentHead && !usedWords.has(item.word) && item.tail !== 'ん';
+function giveHint(){
+  if(isBotTurn) return;
+  const targetChar = getDisplayLastChar(currentWord);
+  const candidates = DICT.filter(d => {
+    if(getFirstChar(d.word) !== targetChar) return false;
+    if(history.some(h => h.word === d.word)) return false;
+    if(d.word.endsWith("ん")) return false;
+    return true;
   });
 
-  if (candidates.length === 0) {
-    hintEmoji.textContent = '😱';
-    hintText.textContent = `「${currentHead}」から はじまる ことばが見つからないよ…！`;
+  const card = $('hintCard');
+  if(candidates.length === 0){
+    $('hintEmoji').textContent = "🤔";
+    $('hintText').textContent = "う〜ん、「" + targetChar + "」から はじまる ことばが 見つからないよ！";
   } else {
     const hintObj = candidates[Math.floor(Math.random() * candidates.length)];
-    const maskWord = hintObj.word.charAt(0) + '◯'.repeat(Math.max(1, hintObj.word.length - 1));
-    hintEmoji.textContent = hintObj.emoji || '💡';
-    hintText.textContent = `ヒント: 「${maskWord}」（${hintObj.word.length}もじ）はどうかな？`;
+    const hintLen = hintObj.word.length;
+    $('hintEmoji').textContent = hintObj.emoji;
+    $('hintText').textContent = `「${targetChar}」から はじまる ${hintLen}もじの ことば：「${hintObj.word[0]}…」があるよ！`;
   }
-  hintCard.classList.add('show');
+  card.classList.add('show');
 }
 
-function hideHint() {
-  hintCard.classList.remove('show');
-}
-
-function setMessage(msg, isOk = false) {
-  messageEl.textContent = msg;
-  messageEl.className = isOk ? 'message ok' : 'message';
-}
-
-function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  }[m]));
-}
-
-function initSpeech() {
+function initSpeech(){
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    micBtn.style.display = 'none';
+  if(!SpeechRecognition){
+    $('micBtn').style.display = "none";
     return;
   }
-
   recognition = new SpeechRecognition();
   recognition.lang = 'ja-JP';
   recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
+  recognition.continuous = false;
 
   recognition.onstart = () => {
     isListening = true;
-    micBtn.classList.add('listening');
-    voiceStatus.textContent = '🎤 お話ししてください...';
+    $('micBtn').classList.add('listening');
+    $('voiceStatus').textContent = "🎙️ お話ししてね...";
   };
 
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript.trim();
-    let matched = dictionary.find(d => d.word === transcript || d.reading === transcript);
-    let hira = matched ? matched.reading : getNormalizedKana(transcript);
-    hira = hira.replace(/[^ぁ-んー]/g, '');
-
-    wordInput.value = hira || transcript;
-    voiceStatus.textContent = `聞き取れたよ: 「${wordInput.value}」`;
-
-    setTimeout(() => {
-      voiceStatus.textContent = '';
-      handlePlayerTurn();
-    }, 600);
+  recognition.onresult = (e) => {
+    let transcript = e.results[0][0].transcript;
+    let converted = normalizeText(transcript);
+    $('wordInput').value = converted;
+    $('voiceStatus').textContent = `「${converted || transcript}」って 聞こえたよ！`;
   };
 
-  recognition.onerror = (event) => {
-    voiceStatus.textContent = 'うまく 聞き取れなかったよ';
-    setTimeout(() => voiceStatus.textContent = '', 2000);
+  recognition.onerror = () => {
+    $('voiceStatus').textContent = "うまく 聞き取れなかったよ";
   };
 
   recognition.onend = () => {
     isListening = false;
-    micBtn.classList.remove('listening');
+    $('micBtn').classList.remove('listening');
+    setTimeout(() => { $('voiceStatus').textContent = ""; }, 3000);
   };
-
-  micBtn.addEventListener('click', () => {
-    if (isListening) {
-      recognition.stop();
-    } else {
-      try {
-        recognition.start();
-      } catch(e) {
-        console.log(e);
-      }
-    }
-  });
 }
 
-submitBtn.addEventListener('click', handlePlayerTurn);
-wordInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') handlePlayerTurn();
-});
+document.addEventListener('DOMContentLoaded', () => {
+  initGame();
+  initSpeech();
 
-hintBtn.addEventListener('click', showHint);
-hintClose.addEventListener('click', hideHint);
-resetBtn.addEventListener('click', startGame);
-overRestart.addEventListener('click', startGame);
-overFinish.addEventListener('click', () => {
-  overlay.style.display = 'none';
-  setMessage('あそんでくれて ありがとう！');
-});
-
-document.querySelectorAll('.kb-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.kb-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.kb-panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    const target = tab.dataset.tab;
-    if (target === 'main') document.getElementById('kbMain').classList.add('active');
-    if (target === 'daku') document.getElementById('kbDaku').classList.add('active');
-    if (target === 'small') document.getElementById('kbSmall').classList.add('active');
+  $('submitBtn').addEventListener('click', handlePlayerSubmit);
+  $('wordInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter') handlePlayerSubmit();
   });
-});
 
-document.querySelectorAll('.kb-key').forEach(key => {
-  key.addEventListener('click', () => {
-    const char = key.dataset.c;
-    if (char) {
-      wordInput.value += char;
-      wordInput.focus();
+  $('micBtn').addEventListener('click', () => {
+    if(!recognition) return;
+    if(isListening){
+      recognition.stop();
+    } else {
+      try { recognition.start(); } catch(err){}
     }
   });
-});
 
-document.getElementById('kbBack').addEventListener('click', () => {
-  wordInput.value = wordInput.value.slice(0, -1);
-  wordInput.focus();
-});
+  document.querySelectorAll('.kb-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.kb-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.kb-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const targetId = "kb" + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
+      $(targetId).classList.add('active');
+    });
+  });
 
-document.getElementById('kbClear').addEventListener('click', () => {
-  wordInput.value = '';
-  wordInput.focus();
-});
+  document.querySelectorAll('.kb-key').forEach(key => {
+    key.addEventListener('click', () => {
+      const char = key.dataset.c;
+      if(char) $('wordInput').value += char;
+    });
+  });
 
-initSpeech();
-startGame();
+  $('kbBack').addEventListener('click', () => {
+    const val = $('wordInput').value;
+    $('wordInput').value = val.slice(0, -1);
+  });
+
+  $('kbClear').addEventListener('click', () => {
+    $('wordInput').value = "";
+  });
+
+  $('hintBtn').addEventListener('click', giveHint);
+  $('hintClose').addEventListener('click', () => {
+    $('hintCard').classList.remove('show');
+  });
+
+  $('resetBtn').addEventListener('click', () => {
+    disableControls(false);
+    initGame();
+  });
+
+  $('overRestart').addEventListener('click', () => {
+    $('overlay').style.display = "none";
+    disableControls(false);
+    initGame();
+  });
+
+  $('overFinish').addEventListener('click', () => {
+    $('overlay').style.display = "none";
+  });
+});
 </script>
+
 </body>
 </html>

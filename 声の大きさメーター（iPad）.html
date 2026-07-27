@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>こえの おおきさ めーたー</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+
+        body {
+            font-family: 'Kosugi Maru', sans-serif;
+            background-color: #e3f2fd;
+            color: #424242;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .main-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 40px;
+            box-shadow: 0 12px 0 #bbdefb;
+            width: 85%;
+            max-width: 420px;
+            text-align: center;
+            border: 6px solid #64b5f6;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-top: 0;
+            color: #1565c0;
+        }
+
+        /* くまさんエリア */
+        .kuma-container {
+            width: 150px;
+            height: 150px;
+            background-color: #ffe0b2;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            border: 6px solid #ffb74d;
+            position: relative;
+            transition: transform 0.1s ease;
+        }
+        .kuma-container::before, .kuma-container::after {
+            content: '';
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background-color: #ffe0b2;
+            border: 6px solid #ffb74d;
+            border-radius: 50%;
+            top: -10px;
+            z-index: -1;
+        }
+        .kuma-container::before { left: -10px; }
+        .kuma-container::after { right: -10px; }
+
+        /* めーたー */
+        .meter-frame {
+            background-color: #f5f5f5;
+            border-radius: 25px;
+            height: 45px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 4px solid #424242;
+            box-sizing: border-box;
+        }
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #a5d6a7 0%, #fff59d 60%, #ffab91 100%);
+            border-radius: 20px;
+            transition: width 0.08s linear;
+        }
+
+        .score-box {
+            background-color: #fff3e0;
+            color: #e65100;
+            border: 3px solid #ffe0b2;
+            border-radius: 15px;
+            padding: 5px 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-family: 'Kosugi Maru', sans-serif;
+            border: none;
+            padding: 15px 45px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.1s;
+            outline: none;
+            width: 80%;
+            margin-bottom: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 起動ボタン */
+        .kaishi-btn {
+            background-color: #4fc3f7;
+            color: white;
+            box-shadow: 0 6px 0 #0288d1;
+        }
+        .kaishi-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #0288d1;
+        }
+        .kaishi-btn.stoppu {
+            background-color: #ff8a65;
+            box-shadow: 0 6px 0 #d84315;
+        }
+
+        /* ダウンロードボタン */
+        .dl-btn {
+            background-color: #81c784;
+            color: white;
+            box-shadow: 0 6px 0 #388e3c;
+            font-size: 1rem;
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+        .dl-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #388e3c;
+        }
+
+        .setsumei { color: #616161; font-size: 0.85rem; margin-top: 15px; }
+        .error { color: #e53935; font-weight: bold; margin-top: 15px; display: none; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="main-card">
+    <h1>こえの おおきさ めーたー</h1>
+    
+    <div class="kuma-container" id="kumaFace">🐻</div>
+    
+    <div class="meter-frame">
+        <div id="meterBar" class="meter-fill"></div>
+    </div>
+    
+    <div>
+        <div class="score-box">おおきさ：<span id="volumeValue">0</span></div>
+    </div>
+    
+    <button id="startBtn" class="kaishi-btn">マイクを つかう</button>
+    <p class="setsumei">おおきな こえを だすと、くまさんが にっこり するよ！</p>
+    
+    <div id="errorMessage" class="error">⚠️エラー：マイクにアクセスできません。「設定」アプリでSafariのマイク許可がオンになっているか確認してください。</div>
+    
+    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
+    
+    <button id="downloadBtn" class="dl-btn">📥 アプリを保存する</button>
+</div>
+
+<script>
+    const startBtn = document.getElementById('startBtn');
+    const meterBar = document.getElementById('meterBar');
+    const volumeValue = document.getElementById('volumeValue');
+    const kumaFace = document.getElementById('kumaFace');
+    const errorMessage = document.getElementById('errorMessage');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let audioContext = null;
+    let analyser = null;
+    let microphone = null;
+    let mediaStream = null;
+    let animationId = null;
+    let isRecording = false;
+
+    const faces = { silent: '😭', low: '🥺', mid: '😮', high: '😊', max: '😆' };
+
+    startBtn.addEventListener('click', async () => {
+        if (isRecording) { stopAudio(); return; }
+
+        try {
+            // 1. iPad/iOS向け: AudioContextの初期化とResume処理
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioCtx();
+            
+            // タップ操作時に強制的にサスペンドを解除（iPadで非常に重要）
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            // 2. マイク権限の取得
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            
+            analyser = audioContext.createAnalyser();
+            microphone = audioContext.createMediaStreamSource(mediaStream);
+
+            analyser.smoothingTimeConstant = 0.25;
+            analyser.fftSize = 512;
+
+            microphone.connect(analyser);
+
+            // 3. requestAnimationFrameによるループ描画 (iPadで安定して高速動作)
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            function updateVolume() {
+                if (!isRecording) return;
+
+                analyser.getByteFrequencyData(dataArray);
+                
+                let values = 0;
+                for (let i = 0; i < dataArray.length; i++) { 
+                    values += dataArray[i]; 
+                }
+                const average = values / dataArray.length;
+                
+                let volumePercent = Math.min(Math.round((average / 50) * 100), 100);
+                
+                meterBar.style.width = volumePercent + '%';
+                volumeValue.textContent = volumePercent;
+
+                if (volumePercent < 5) {
+                    kumaFace.textContent = faces.silent; kumaFace.style.transform = 'scale(0.95)';
+                } else if (volumePercent < 25) {
+                    kumaFace.textContent = faces.low; kumaFace.style.transform = 'scale(0.98)';
+                } else if (volumePercent < 55) {
+                    kumaFace.textContent = faces.mid; kumaFace.style.transform = 'scale(1.0)';
+                } else if (volumePercent < 85) {
+                    kumaFace.textContent = faces.high; kumaFace.style.transform = 'scale(1.05)';
+                } else {
+                    kumaFace.textContent = faces.max; kumaFace.style.transform = 'scale(1.15)';
+                }
+
+                animationId = requestAnimationFrame(updateVolume);
+            }
+
+            startBtn.textContent = 'ストップする';
+            startBtn.classList.add('stoppu');
+            errorMessage.style.display = 'none';
+            isRecording = true;
+            
+            updateVolume();
+
+        } catch (err) {
+            console.error(err);
+            errorMessage.style.display = 'block';
+            kumaFace.textContent = '😵';
+            stopAudio();
+        }
+    });
+
+    function stopAudio() {
+        isRecording = false;
+        
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        if (microphone) {
+            microphone.disconnect();
+            microphone = null;
+        }
+        if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+        }
+
+        meterBar.style.width = '0%';
+        volumeValue.textContent = '0';
+        kumaFace.textContent = '🐻';
+        kumaFace.style.transform = 'scale(1.0)';
+        startBtn.textContent = 'マイクを つかう';
+        startBtn.classList.remove('stoppu');
+    }
+
+    downloadBtn.addEventListener('click', () => {
+        const htmlContent = document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'こえのおおきさメーター.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+</script>
+
+</body>
+</html>

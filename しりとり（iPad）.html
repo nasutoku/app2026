@@ -886,7 +886,7 @@ function initSpeech(){
     let transcript = e.results[0][0].transcript;
     let converted = normalizeText(transcript);
     $('wordInput').value = converted;
-    $('voiceStatus').textContent = `「${converted || transcript}」って聞こえたよ！　漢字になってしまうときは手で入力してね。`;
+    $('voiceStatus').textContent = `「${converted || transcript}」って聞こえたよ！　漢字になってしまうときは手で入力してね。　　　　`;
   };
 
   recognition.onerror = () => {
